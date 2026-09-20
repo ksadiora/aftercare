@@ -1,0 +1,16 @@
+{
+  "name": "codis-cove",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A local 3D life-skills adventure for VTHacks 14",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "dev": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check:gemini": "node scripts/check-gemini.mjs"
+  },
+  "dependencies": { "three": "0.180.0" },
+  "engines": { "node": ">=20" }
+}

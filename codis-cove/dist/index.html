@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#194b42" />
+    <title>Codi’s Cove — Little adventures. Real-life skills.</title>
+    <meta
+      name="description"
+      content="Explore a playful 3D island, learn to save, plan your day, and grow your community. A local life-skills adventure with Codi."
+    />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./game-hud.css" />
+    <link rel="stylesheet" href="./tutorials.css" />
+  </head>
+  <body class="third-person">
+    <div id="app">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="Codi’s Cove home"
+          ><span class="brand-mark" aria-hidden="true">c<span>✦</span></span
+          ><span
+            >codi’s cove<span class="brand-sub"
+              >SUNBEAM ISLAND · CHAPTER 01</span
+            ></span
+          ></a
+        >
+        <nav class="main-nav" aria-label="Game navigation">
+          <button class="nav-item active" data-action="explore">
+            <span>↶</span> Resume</button
+          ><button class="nav-item" data-action="journal">
+            <kbd>1</kbd> Journal <i id="quest-count">3</i></button
+          ><button class="nav-item" data-action="backpack">
+            <kbd>2</kbd> Backpack
+          </button>
+          <button class="nav-item" data-action="codi" aria-label="Chat with Codi">
+            <kbd>C</kbd> Codi
+          </button>
+          <button class="nav-item" data-action="guides" aria-label="Learn banking apps and Notion">
+            <kbd>T</kbd> App guides
+          </button>
+        </nav>
+        <div class="header-tools">
+          <button
+            class="icon-btn"
+            id="sound-toggle"
+            aria-label="Enable sound"
+            title="Enable sound"
+          >
+            ♪</button
+          ><button
+            class="icon-btn"
+            data-action="settings"
+            aria-label="Open settings"
+            title="Settings"
+          >
+            ⚙</button
+          ><button
+            class="profile-btn"
+            data-action="profile"
+            aria-label="View explorer profile"
+          >
+            J<span></span>
+          </button>
+        </div>
+      </header>
+      <main id="world-shell">
+        <div
+          id="world"
+          role="application"
+          aria-label="Third-person island game. WASD to move, Space to jump, Shift to sprint, drag to look around, E to interact nearby."
+          tabindex="0"
+        ></div>
+        <div class="world-wash"></div>
+        <div class="island-intro">
+          <div class="eyebrow">
+            <span class="sun-icon">☀</span> A GOOD DAY TO GROW
+          </div>
+          <h1>Welcome to the cove<span>.</span></h1>
+          <p>Your own little world of big possibilities.</p>
+        </div>
+        <div class="player-stats">
+          <button class="level-chip" data-action="profile">
+            <span class="level-icon">✦</span
+            ><span
+              ><small>LEVEL <b id="level-number">1</b></small
+              ><strong id="level-name">Curious explorer</strong
+              ><span class="xp-track"><i id="xp-fill"></i></span
+            ></span></button
+          ><button
+            class="coin-chip"
+            data-action="backpack"
+            aria-label="Open backpack and see Cove coins"
+          >
+            <span class="coin-symbol">c</span
+            ><strong id="coin-count">120</strong>
+          </button>
+        </div>
+        <aside class="quest-panel" aria-label="Current adventure">
+          <div class="quest-top">
+            <span class="eyebrow">TRACKED QUEST</span
+            ><button
+              id="collapse-quest"
+              class="small-compass"
+              aria-label="Collapse quest tracker"
+              aria-expanded="true"
+            >
+              −
+            </button>
+          </div>
+          <span class="quest-category" id="quest-category">MONEY SMARTS</span>
+          <h2 id="quest-title">A little saved.<br />A lot possible.</h2>
+          <p id="quest-description">
+            Big dreams start with small steps. Let’s save up for something good.
+          </p>
+          <div class="quest-reward">
+            <span>✦ <b>50 XP</b></span
+            ><span><i class="mini-coin">c</i> <b>20 coins</b></span>
+          </div>
+          <button class="primary-btn" id="start-quest">
+            Let’s do this <span>↗</span>
+          </button>
+          <div class="quest-pagination">
+            <span class="active"></span><span></span><span></span
+            ><small id="quest-step">1 of 3 adventures</small>
+          </div>
+        </aside>
+        <div id="landmark-labels" aria-label="Island destinations"></div>
+        <div class="island-caption">
+          <span class="map-pin">⌖</span>
+          <div>
+            <strong>Sunbeam Island</strong><span>YOUR FIRST CHAPTER</span>
+          </div>
+        </div>
+        <button class="map-button" data-action="map">
+          <span>⌗</span> Island map <kbd>M</kbd>
+        </button>
+        <div class="codi-widget">
+          <span class="codi-avatar" id="codi-avatar">◉</span>
+          <div>
+            <strong>A little help from Codi</strong>
+            <p id="codi-tip">
+              Pick a place. There’s a little adventure everywhere.
+            </p>
+            <button data-action="codi">Let’s talk <span>↗</span></button>
+          </div>
+        </div>
+        <div class="movement-hint">
+          <span><kbd>W A S D</kbd> Move</span><span><kbd>SPACE</kbd> Jump</span
+          ><span><kbd>SHIFT</kbd> Sprint</span
+          ><span>Drag to look · scroll to zoom</span>
+        </div>
+        <div id="objective-bearing" class="objective-bearing">
+          <span id="bearing-arrow">↑</span
+          ><span id="bearing-title">Bank terminal</span
+          ><b id="bearing-distance"></b>
+        </div>
+        <div class="location-badge">
+          <span>☀</span> SUNBEAM ISLAND <i>Free roam</i>
+        </div>
+        <div
+          id="world-feedback"
+          class="world-feedback"
+          role="status"
+          aria-live="polite"
+        ></div>
+        <div id="reticle" aria-hidden="true"></div>
+        <button id="jump-btn" class="jump-btn" aria-label="Jump">
+          ↑<small>JUMP</small>
+        </button>
+        <div class="camera-buttons">
+          <button id="camera-left" aria-label="Rotate camera left">↶</button
+          ><button id="camera-right" aria-label="Rotate camera right">↷</button>
+        </div>
+        <div class="local-note">
+          <span></span> Progress saved on this device
+        </div>
+        <button id="interact-btn" class="interact-btn" hidden>
+          <kbd>E</kbd>
+          <div>
+            <small id="interact-place">NEARBY</small><span>Interact</span>
+          </div>
+        </button>
+        <div class="touch-controls" aria-label="Movement controls">
+          <button data-move="up" aria-label="Move forward">↑</button
+          ><button data-move="left" aria-label="Move left">←</button
+          ><button data-move="down" aria-label="Move backward">↓</button
+          ><button data-move="right" aria-label="Move right">→</button>
+        </div>
+        <div id="world-loading" class="world-loading">
+          A little island is waking up…
+        </div>
+      </main>
+      <div id="toast" role="status" aria-live="polite"></div>
+      <dialog id="game-dialog" aria-labelledby="dialog-title">
+        <div class="dialog-inner">
+          <button
+            id="close-dialog"
+            class="dialog-close"
+            aria-label="Close dialog"
+          >
+            ×
+          </button>
+          <div id="dialog-content"></div>
+        </div>
+      </dialog>
+    </div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
