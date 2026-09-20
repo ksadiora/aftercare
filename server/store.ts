@@ -73,7 +73,7 @@ export class Store {
     return this.db.prepare('SELECT data FROM patients WHERE runId=?').all(this.runId).map(r => parse<Patient>(r)!)
       .filter(p => p.disposition === 'escalated')
       // Only escalations the gate delivered reach the provider. Held and rejected ones stay with the nurse, with the reason.
-      .filter(p => this.latestEscalation(p.id)?.status === 'delivered')
+      .filter(p => this.latestEscalation(p.id, true)?.status === 'delivered')
       .map(p => {
         const escalation = (this.db.prepare("SELECT * FROM audit WHERE runId=? AND patientId=? AND kind='escalate' ORDER BY id DESC LIMIT 1").get(this.runId, p.id) as unknown as AuditEvent | undefined);
         const reply = (this.db.prepare("SELECT * FROM audit WHERE runId=? AND patientId=? AND kind='provider_note' ORDER BY id DESC LIMIT 1").get(this.runId, p.id) as unknown as AuditEvent | undefined);
@@ -86,7 +86,7 @@ export class Store {
           summary: summary?.text ?? null, summarySource: summary?.actor ?? null,
           lastReply: reply?.text ?? null, repliedAt: reply?.createdAt ?? null,
           thread: this.caseThread(p.id),
-          escalation: this.latestEscalation(p.id),
+          escalation: this.latestEscalation(p.id, true),
         };
       })
       .sort((a, b) => String(b.escalatedAt).localeCompare(String(a.escalatedAt)));
@@ -119,8 +119,10 @@ export class Store {
     this.db.prepare('INSERT INTO escalations(id,runId,patientId,requestId,status,createdAt,data) VALUES(?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET status=excluded.status, data=excluded.data')
       .run(record.id, record.runId, record.patientId, record.requestId, record.status, record.createdAt, JSON.stringify(record));
   }
-  latestEscalation(patientId: string, runId = this.runId): EscalationRecord | null {
-    return parse<EscalationRecord>(this.db.prepare('SELECT data FROM escalations WHERE runId=? AND patientId=? ORDER BY createdAt DESC, rowid DESC LIMIT 1').get(runId, patientId)) ?? null;
+  /** Newest attempt for the case. With genuineOnly, demo attempts (an attacker's copy, always rejected) are skipped: they never decide delivery. */
+  latestEscalation(patientId: string, genuineOnly = false, runId = this.runId): EscalationRecord | null {
+    const rows = this.db.prepare('SELECT data FROM escalations WHERE runId=? AND patientId=? ORDER BY createdAt DESC, rowid DESC LIMIT 20').all(runId, patientId).map(r => parse<EscalationRecord>(r)!);
+    return rows.find(r => !genuineOnly || r.variant === 'genuine') ?? null;
   }
   escalationByRequest(requestId: string): EscalationRecord | null {
     return parse<EscalationRecord>(this.db.prepare('SELECT data FROM escalations WHERE requestId=? ORDER BY rowid DESC LIMIT 1').get(requestId)) ?? null;

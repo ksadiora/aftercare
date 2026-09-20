@@ -22,9 +22,9 @@ export function EscalationGate({ patientId, mode, nurse = 'Demo nurse' }: { pati
   const [open, setOpen] = useState(mode === 'provider');
 
   const load = useCallback(async () => {
-    try { setView(await api<EscalationView>(`/patients/${patientId}/escalation`)); }
+    try { setView(await api<EscalationView>(`/patients/${patientId}/escalation${mode === 'provider' ? '?genuine=1' : ''}`)); }
     catch { /* keep the last view; the next update retries */ }
-  }, [patientId]);
+  }, [patientId, mode]);
 
   useEffect(() => {
     void load();
