@@ -1,15 +1,14 @@
 # Aftercare
 
-> Post-discharge care that reaches the patient first.
+> **Post-discharge care that reaches the patient first.**
 
 Aftercare is an AI-assisted post-discharge follow-up system that conducts bilingual patient check-ins, identifies concerns in real time, prioritizes patients for nurses, generates source-linked clinical briefings, and securely escalates cases to providers.
 
-It combines conversational AI with deterministic safety rules, real-time voice, clinician workflows, cryptographic identity verification, and auditable evidence.
+It combines conversational AI, deterministic safety rules, real-time voice, clinician workflows, cryptographic identity verification, and auditable evidence into one post-discharge care system.
 
-![Aftercare nurse worklist](docs/images/worklist.png)
 
-**Demo:** [Add demo video]
-**Devpost:** [Add Devpost]
+**Demo Video:** [Add demo link]
+**Devpost:** [Add Devpost link]
 **Built at VT Hacks 14**
 
 ---
@@ -22,42 +21,43 @@ It combines conversational AI with deterministic safety rules, real-time voice, 
 | Patient interaction modes                 | Voice, simulation, text, live handoff |
 | Escalation verification checks            |                                     6 |
 | Languages                                 |                     English + Spanish |
-| Synthetic patients per demo run           |                                    40 |
-| Full wound-concern demo                   |                           ~13 seconds |
-| Local demo cost                           |                                    $0 |
+| Synthetic patients per demo               |                                    40 |
+| Full wound-concern scenario               |                           ~13 seconds |
+| Local simulation cost                     |                                    $0 |
 | External services required for simulation |                                  None |
 
-Aftercare can run its complete deterministic demo locally with no cloud database, phone number, tunnel, API credits, or external network.
+Aftercare can run its complete deterministic simulation locally with no cloud database, phone number, tunnel, API credits, or external network.
 
 ---
 
 ## The Problem
 
-Hospital discharge is a handoff from continuous clinical supervision to a patient suddenly managing recovery at home.
+Hospital discharge is a major transition.
+
+A patient goes from continuous clinical supervision to managing recovery largely on their own.
 
 In the United States, there were approximately **3.6 million 30-day hospital readmissions in 2022**, with an average cost of **$20,329 per readmission**.
 
 More than a third of readmissions occur within the **first 14 days after discharge**.
 
-That is exactly when small problems can become serious:
+That is exactly when seemingly small problems can become serious:
 
-* a wound begins to look different
-* a patient is unsure about medication
-* transportation prevents follow-up
-* symptoms are difficult to describe
-* a patient does not know whether a concern is worth calling about
+* A wound starts looking different
+* A patient is unsure about medication
+* Transportation prevents follow-up
+* Symptoms are difficult to describe
+* A patient is unsure whether a concern is serious enough to call about
+* Language or technology makes traditional follow-up difficult
 
-Traditional follow-up systems depend heavily on patients initiating contact.
+Traditional follow-up often depends on the patient initiating contact.
 
 Aftercare reverses that model.
 
-The system initiates the check-in, listens to the patient naturally, detects concerns, and organizes the result for the care team.
+The system initiates the check-in, listens to the patient naturally, identifies concerns, organizes the result for the care team, and supports secure escalation when needed.
 
 ---
 
-# How Aftercare Works
-
-Aftercare creates a continuous path from patient follow-up to clinician action.
+## How Aftercare Works
 
 ```text
 Patient
@@ -76,21 +76,21 @@ Patient
 ┌──────────────────────────────┐
 │     Safety Rules Engine      │
 │                              │
-│ Emergency detection          │
-│ Wound concerns               │
-│ Medication concerns          │
-│ Practical barriers           │
-│ Uncertainty detection        │
+│  Emergency detection         │
+│  Wound concerns              │
+│  Medication concerns         │
+│  Practical barriers          │
+│  Uncertainty detection       │
 └──────────────┬───────────────┘
                │
                ▼
 ┌──────────────────────────────┐
 │      Nurse Worklist          │
 │                              │
-│ Risk sorting                 │
-│ Full transcript              │
-│ Source-linked briefing       │
-│ Audit trail                  │
+│  Risk sorting                │
+│  Full transcript             │
+│  Source-linked briefing      │
+│  Audit trail                 │
 └──────────────┬───────────────┘
                │
                │ Escalation
@@ -98,25 +98,25 @@ Patient
 ┌──────────────────────────────┐
 │       Callsign Gate          │
 │                              │
-│ Identity                     │
-│ Certificate                  │
-│ Transparency log             │
-│ Signature                    │
-│ Provider policy              │
-│ Content verification         │
+│  Identity                    │
+│  Certificate                 │
+│  Transparency log            │
+│  Signature                   │
+│  Provider policy             │
+│  Content verification        │
 └──────────────┬───────────────┘
                │
                ▼
             Provider
 ```
 
-The key design choice is simple:
+The core design principle is simple:
 
-> AI helps understand the conversation. Deterministic server rules control safety-critical decisions.
+> **AI helps understand the conversation. Deterministic server rules control safety-critical decisions.**
 
 ---
 
-# Core Features
+## Core Features
 
 ### Bilingual Conversational Check-In
 
@@ -124,10 +124,10 @@ Patients can complete the intake naturally in **English or Spanish**.
 
 Aftercare supports:
 
-* live ElevenLabs voice conversations
-* browser-based simulation
-* text conversation
-* live nurse handoff
+* Live ElevenLabs voice conversations
+* Browser-based voice simulation
+* Text conversations
+* Live nurse handoff
 
 The patient's original words remain available to the care team throughout the workflow.
 
@@ -137,10 +137,8 @@ The patient's original words remain available to the care team throughout the wo
 
 Urgency is determined by a server-side rules engine before any language model is consulted.
 
-The engine detects categories including:
-
 ```text
-Emergency language       → Immediate emergency path
+Emergency language       → Immediate emergency pathway
 Wound concerns           → Urgent review
 Medication concerns      → Urgent review
 Practical barriers       → Review
@@ -148,49 +146,47 @@ Patient uncertainty      → Review
 Routine response         → Continue intake
 ```
 
-Emergency language immediately interrupts the normal questionnaire and switches to the emergency pathway.
+Emergency language immediately interrupts the normal questionnaire and activates the emergency pathway.
 
-This creates a clean separation between:
+This creates a clear separation between:
 
 **AI for language understanding**
 
 and
 
-**deterministic logic for clinical workflow control**
+**deterministic logic for safety-critical workflow control**
 
 ---
 
-### Bounded AI Clarification
+## Adaptive AI Clarification
 
 Patients rarely answer medical questions in perfectly structured sentences.
 
 They say things like:
 
-> “It’s kind of warm, but I think it’s probably okay.”
+> "It's kind of warm, but I think it's probably okay."
 
-When the rules engine cannot confidently interpret a response, Gemini can reformulate the current question.
+When the rules engine cannot confidently interpret a response, Gemini can rephrase the current question to make it easier for the patient to answer.
 
-That clarification system is deliberately bounded.
+The clarification system is tightly bounded.
 
-The model can clarify one question while the server continues to own:
+The model can clarify the current question while the server continues to control:
 
-* questionnaire progression
-* urgency
-* disposition
-* session completion
-* escalation
+* Questionnaire progression
+* Urgency
+* Patient disposition
+* Session completion
+* Escalation
 
-The result is natural conversation without giving the language model control over the safety-critical state machine.
+This creates natural conversation while keeping the safety-critical workflow under deterministic server control.
 
 ---
 
-# Source-Linked Clinical Briefing
+## Source-Linked Clinical Briefing
 
-Aftercare converts a full patient conversation into a concise briefing for the care team.
+Aftercare converts the patient conversation into a concise briefing for the care team.
 
-But the briefing stays connected to its evidence.
-
-Every generated statement references the transcript lines supporting it.
+Every generated statement is linked back to the transcript evidence supporting it.
 
 ```text
 Patient:
@@ -203,139 +199,131 @@ Source:
 Transcript lines 18–19
 ```
 
-The clinician can move directly from summary to original evidence.
-
-This creates an auditable path:
+The clinician can move directly from a generated summary to the patient's original statement.
 
 ```text
-Patient statement
-      ↓
+Patient Statement
+       ↓
 Transcript
-      ↓
-Generated briefing
-      ↓
-Source citation
-      ↓
-Clinician review
+       ↓
+Generated Briefing
+       ↓
+Source Citation
+       ↓
+Clinician Review
 ```
 
-Automated summaries and nurse-authored notes are also stored separately with distinct attribution.
+Automated summaries and nurse-authored notes are stored separately with distinct attribution.
 
-That preserves the origin of every piece of information.
+This preserves the origin of every piece of information.
 
 ---
 
-# A Risk-Sorted Nurse Worklist
+## Risk-Sorted Nurse Worklist
 
-Aftercare is designed around the clinician workflow rather than just the patient conversation.
+Aftercare is built around the clinician workflow, not just the patient conversation.
 
-The nurse dashboard turns an entire patient cohort into a prioritized queue.
+The nurse dashboard converts an entire patient cohort into a prioritized worklist.
 
 Each case can include:
 
-* risk level
-* patient transcript
-* detected concerns
-* automated briefing
-* supporting transcript evidence
-* nurse notes
-* conversation history
-* escalation status
-* live handoff controls
-* audit history
+* Risk level
+* Full patient transcript
+* Detected concerns
+* Automated briefing
+* Supporting transcript evidence
+* Nurse notes
+* Conversation history
+* Escalation status
+* Live handoff controls
+* Audit history
 
-Instead of reading forty conversations equally, the care team can immediately focus on the patients who need attention first.
+Instead of treating every follow-up equally, the care team can immediately focus on patients requiring attention.
 
 ---
 
-# Self-Initiating Outreach
+## Self-Initiating Outreach
 
-Aftercare can create follow-up outreach automatically.
+Aftercare can automatically create follow-up outreach.
 
-On **day 3 after discharge**, when no contact has been recorded, the server creates an invitation for the patient.
+On **day 3 after discharge**, if no contact has been recorded, the server creates a patient invitation.
 
-The invitation uses a scoped patient token.
+Each invitation contains a scoped patient token:
 
 ```text
 /c/<token>
 ```
 
-That route opens only the patient's check-in experience.
+That route opens only the patient's individual check-in experience.
 
-The patient sees:
+The system separates three different interfaces:
 
-* their check-in
-* their conversation
-* their interaction controls
+| Route        | User      | Purpose                              |
+| ------------ | --------- | ------------------------------------ |
+| `/c/<token>` | Patient   | Individual check-in                  |
+| `/nurse`     | Care team | Worklist, briefing, handoff, actions |
+| `/provider`  | Provider  | Verified escalated cases             |
 
-The clinical dashboard remains a separate protected surface.
-
-The architecture cleanly separates the three roles:
-
-| Route        | User      | Purpose                                 |
-| ------------ | --------- | --------------------------------------- |
-| `/c/<token>` | Patient   | Individual check-in                     |
-| `/nurse`     | Care team | Worklist, briefing, handoff and actions |
-| `/provider`  | Provider  | Verified escalated cases                |
+This keeps patient, nurse, and provider workflows separated while connecting them through one system.
 
 ---
 
-# Live Nurse Handoff
+## Live Nurse Handoff
 
-A patient can request to speak with a person during the check-in.
+A patient can request to speak directly with a care-team member during the check-in.
 
-When that happens, open nurse dashboards receive the request.
+When that happens, available nurse dashboards receive the request.
 
 The handoff system includes:
 
-* atomic nurse acceptance
-* room-scoped join tokens
+* Atomic nurse acceptance
+* Room-scoped join tokens
 * 10-minute token expiration
-* real-time dashboard updates
-* explicit participant state
+* Real-time dashboard updates
+* Participant-state tracking
 
-A call is marked live only after both participants have joined.
+A call is reported as live only after both participants have successfully joined.
 
-This turns Aftercare from a passive questionnaire into a direct bridge between patient and care team.
+This turns Aftercare from a passive questionnaire into a direct bridge between the patient and care team.
 
 ---
 
-# Technical Highlight: Solving Voice Interruption
+## Technical Highlight: Solving Voice Interruption
 
-Natural voice interaction introduced a deceptively hard problem.
+Natural voice interaction introduced an important engineering problem.
 
-A recovering patient might:
+During recovery, patients may:
 
-* cough
-* shift in a chair
-* move their phone
-* make a short background sound
+* Cough
+* Shift in a chair
+* Move their phone
+* Make short background noises
 
-A voice system can interpret those events as interruptions.
+Voice systems can interpret those sounds as interruptions and stop speaking unexpectedly.
 
-Aftercare solves this with two complementary layers.
+Aftercare handles this with two complementary layers.
 
-## Browser-Level Audio Gate
+### Browser-Level Audio Gate
 
-While the agent is speaking, the browser monitors the actual microphone input.
+While the agent is speaking, the browser continues monitoring the actual microphone input.
 
-The microphone opens for interruption only after approximately:
+The interruption gate opens only after approximately:
 
 **180 ms of sustained input**
 
-This is long enough to reject many transient noises while remaining responsive to intentional speech.
+This filters many short accidental noises while remaining responsive to intentional speech.
 
 After speech stops, the gate remains open for roughly:
 
 **1 second**
 
-That prevents natural gaps between words from prematurely closing the microphone.
+This prevents natural gaps between words from closing the microphone too quickly.
 
-During normal listening, the gate is removed entirely so patient answers remain uninterrupted.
+When the system is actively listening for the patient's answer, the gate is removed so normal responses are not clipped.
 
 ---
 
-## Agent-Level Turn Handling
+### Agent-Level Turn Handling
 
 The voice agent separately handles short non-lexical fillers such as:
 
@@ -355,15 +343,15 @@ sí
 claro
 ```
 
-The result is a voice interaction that is both responsive and resistant to accidental interruption.
+Together, these layers create voice interaction that remains responsive while reducing accidental interruptions.
 
 ---
 
-# Technical Highlight: Callsign
+## Technical Highlight: Callsign
 
-Clinical escalation introduces another problem:
+Clinical escalation introduces another challenge:
 
-> How does one healthcare agent know that the destination receiving a patient escalation is actually the intended provider?
+> **How does one healthcare agent verify that an escalation is actually reaching the intended provider?**
 
 Aftercare integrates **Callsign**, an agent identity and verification layer.
 
@@ -380,7 +368,7 @@ Before an escalation reaches the provider, the request passes through six indepe
 
 Each verification step preserves its evidence.
 
-The provider receives both the clinical escalation and the proof that accompanied it.
+The provider receives both the escalation and the verification evidence associated with it.
 
 ---
 
@@ -389,7 +377,7 @@ The provider receives both the clinical escalation and the proof that accompanie
 ```text
 Care Team
     │
-    │ signed escalation
+    │ Signed Escalation
     ▼
 careteam.aftercare.work
     │
@@ -421,29 +409,29 @@ lee.callsign-hcp.com
 Provider
 ```
 
-The local environment includes:
+The local verification environment includes:
 
-* a private certificate authority
+* Private certificate authority
 * X.509 identity certificates
-* a Merkle transparency log
-* signed checkpoints
-* request verification evidence
+* Merkle transparency log
+* Signed checkpoints
+* Request verification evidence
 
 Verification evidence can be inspected through:
 
-```text
+```http
 GET /api/proof/<requestId>
 ```
 
 ---
 
-# Attack Demonstration
+## Security Demonstration
 
-The Callsign demo also makes the security model visible.
+The Callsign interface makes the security architecture visible.
 
-After a legitimate escalation is created, the interface can replay modified versions through the same verification pipeline.
+After a legitimate escalation is generated, the system can replay altered versions through the same verification pipeline.
 
-Three scenarios demonstrate different security properties:
+Three built-in scenarios demonstrate different security properties:
 
 ```text
 Spoofed identity
@@ -451,45 +439,45 @@ Tampered request
 Replayed request
 ```
 
-Each request goes through the same gate as a legitimate escalation.
+Each request passes through the same gate used for legitimate escalations.
 
-The interface then shows which verification check handled the request.
+The interface displays which verification step handled the request.
 
-That makes the security architecture observable instead of leaving it hidden behind the backend.
+This turns backend security into something that can be directly observed during the demo.
 
 ---
 
-# Model Selection Based on Measurement
+## Model Selection Based on Measurement
 
-Aftercare uses different models for different latency constraints.
+Aftercare uses different models for different latency requirements.
 
-A clarification occurs inside an active voice conversation, so it must fit comfortably inside ElevenLabs' **10-second tool window**.
+A clarification occurs during an active voice conversation and must fit comfortably inside ElevenLabs' **10-second tool window**.
 
 Measured performance:
 
-| Model                                    | Measured latency | Role                    |
+| Model                                    | Measured Latency | Role                    |
 | ---------------------------------------- | ---------------: | ----------------------- |
 | `gemini-flash-lite-latest`               |           ~0.9 s | Real-time clarification |
 | `gemini-3.6-flash`                       |         2.4–8+ s | Higher-depth processing |
 | `gemini-3.6-flash` without turn deadline |         Flexible | Clinical briefing       |
 
-Instead of using one model everywhere, Aftercare assigns models based on the requirements of each task.
+Instead of using one model for every task, Aftercare selects models based on the requirements of each part of the system.
 
 ```text
-Real-time conversation
+Real-Time Conversation
         ↓
-Low-latency model
+Low-Latency Model
 
-Clinical briefing
+Clinical Briefing
         ↓
-Higher-depth model
+Higher-Depth Model
 ```
 
-This keeps conversation responsive while allowing richer reasoning where latency is less constrained.
+This keeps live conversations responsive while allowing more detailed processing where latency is less constrained.
 
 ---
 
-# Performance
+## Performance
 
 | Metric                       |      Result |
 | ---------------------------- | ----------: |
@@ -505,7 +493,7 @@ This keeps conversation responsive while allowing richer reasoning where latency
 
 ---
 
-# Architecture
+## System Architecture
 
 ```text
 Patient
@@ -520,7 +508,7 @@ Patient
 │             └── finish_session
 │
 └── Text
-       └── Gemini clarification
+       └── Gemini Clarification
               │
               ▼
      ┌──────────────────────────┐
@@ -550,11 +538,11 @@ Patient
           │
           ├── ANS resolution
           ├── X.509 certificate
-          ├── transparency log
-          ├── signature
-          ├── replay protection
-          ├── provider policy
-          └── content screen
+          ├── Transparency log
+          ├── Signature
+          ├── Replay protection
+          ├── Provider policy
+          └── Content screen
           │
           ▼
        Provider
@@ -562,61 +550,61 @@ Patient
 
 ---
 
-# Built for Auditability
+## Built for Auditability
 
-Healthcare software needs more than a final output.
+Healthcare systems need more than a final answer.
 
 Aftercare records the path that produced it.
 
 The audit system captures information including:
 
-* patient conversation
-* routing decisions
-* clarification events
-* model identity
-* model latency
-* escalation evidence
-* nurse actions
-* automated summaries
-* clinician notes
-* handoff state
-* verification results
+* Patient conversation
+* Routing decisions
+* Clarification events
+* Model identity
+* Model latency
+* Escalation evidence
+* Nurse actions
+* Automated summaries
+* Clinician notes
+* Handoff state
+* Verification results
 
 Patient-generated, AI-generated, and clinician-generated information remain separately attributed.
 
 ---
 
-# Safety by Design
+## Safety by Design
 
-Aftercare uses several architectural boundaries to keep AI in a narrow and inspectable role.
+Aftercare uses architectural boundaries to keep AI in a narrow, inspectable role.
 
-### Rules own urgency
+### Rules Own Urgency
 
 Emergency and concern routing happen through deterministic server logic.
 
-### Models clarify language
+### Models Clarify Language
 
-AI improves conversational understanding without owning the workflow state.
+AI improves conversational understanding while the server controls workflow state.
 
-### Clinicians retain control
+### Clinicians Retain Control
 
-Care-team actions and resolution remain explicit clinician actions.
+Care-team actions and case resolution remain explicit clinician actions.
 
-### Evidence stays attached
+### Evidence Stays Attached
 
-Generated briefings link back to patient statements.
+Generated briefings link directly back to patient statements.
 
-### Escalations are verified
+### Escalations Are Verified
 
 Provider-bound requests pass through a cryptographic verification layer.
 
-### Every important action is auditable
+### Important Actions Are Auditable
 
 State transitions and automated operations are preserved in the audit history.
 
 ---
 
-# Testing
+## Testing
 
 Run the test suite with:
 
@@ -626,70 +614,70 @@ npm run build
 npm run test:e2e
 ```
 
-The test suite covers major system behavior across:
-
 ### Conversation
 
+The test suite covers:
+
 * English and Spanish routing
-* consent
-* ambiguity
-* negation
-* repeated starts
-* adaptive clarification
-* preserved flags
-* session persistence
+* Consent
+* Ambiguity
+* Negation
+* Repeated starts
+* Adaptive clarification
+* Preserved flags
+* Session persistence
 
 ### Safety
 
-* emergency interruption
-* server timeouts
-* stale results
-* routing rules
-* recording protection
-* clinician-controlled resolution
+* Emergency interruption
+* Server timeouts
+* Stale results
+* Routing rules
+* Recording protection
+* Clinician-controlled resolution
 
 ### AI
 
-* clarification boundaries
-* model latency
-* source-linked briefings
-* citation validation
-* graceful provider handling
+* Clarification boundaries
+* Model latency
+* Source-linked briefings
+* Citation validation
+* Provider handling
 
 ### Handoff
 
-* atomic nurse claims
-* token scope
-* token signing
-* join state
-* ring timeout behavior
+* Atomic nurse claims
+* Token scope
+* Token signing
+* Join state
+* Ring timeout behavior
 
 ### Security
 
 * ANS parsing
-* destination verification
-* replay handling
-* origin policy
-* host policy
-* rate limits
+* Destination verification
+* Replay handling
+* Origin policy
+* Host policy
+* Rate limits
 
 ### Browser
 
-* live worklist updates
-* refresh recovery
-* history
-* microphone handling
-* keyboard accessibility
-* mobile layout
-* text clarification
-* source links
-* handoff state
+* Live worklist updates
+* Refresh recovery
+* History
+* Microphone handling
+* Keyboard accessibility
+* Mobile layout
+* Text clarification
+* Source links
+* Handoff state
 
-End-to-end browser tests use a separate database and local Gemini stand-in so the test suite can run without consuming model quota.
+End-to-end browser tests use a separate database and local Gemini stand-in so the suite can run without consuming model quota.
 
 ---
 
-# Getting Started
+## Getting Started
 
 Aftercare requires:
 
@@ -698,11 +686,21 @@ Node.js 24+
 npm
 ```
 
-Install and start:
+Install dependencies:
 
 ```bash
 npm install
+```
+
+Build the project:
+
+```bash
 npm run build
+```
+
+Start the application:
+
+```bash
 npm start
 ```
 
@@ -722,11 +720,11 @@ For development:
 npm run dev
 ```
 
-Vite runs on port `4317` and the API runs on `4318`.
+Vite runs on port `4317` and the API runs on port `4318`.
 
 ---
 
-# Enable Live AI Features
+## Enable Live AI Features
 
 Copy:
 
@@ -742,7 +740,7 @@ to:
 
 Then configure the integrations you want.
 
-| Feature                | Environment variables                                  |
+| Feature                | Environment Variables                                  |
 | ---------------------- | ------------------------------------------------------ |
 | Adaptive clarification | `GEMINI_API_KEY`                                       |
 | Text conversation      | `GEMINI_API_KEY`                                       |
@@ -751,85 +749,87 @@ Then configure the integrations you want.
 | Nurse handoff          | `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET` |
 | Agent identity         | `ANS_API_KEY`, `ANS_CARE_TEAM_NAME`                    |
 
-For live voice:
+For live voice setup:
 
 ```bash
 npm run voice:setup
 ```
 
-The setup creates the private ElevenLabs agent and prints the resulting:
+The setup creates the private ElevenLabs agent and prints:
 
 ```text
 ELEVENLABS_AGENT_ID
 ```
 
+Add that value to your `.env` file.
+
 ---
 
-# Project Structure
+## Project Structure
 
 ```text
 Aftercare
 │
-├── Patient experience
+├── Patient Experience
 │   ├── Voice
 │   ├── Text
 │   └── Simulation
 │
-├── Care-team application
-│   ├── Risk worklist
-│   ├── Clinical briefing
-│   ├── Nurse actions
-│   └── Live handoff
+├── Care-Team Application
+│   ├── Risk Worklist
+│   ├── Clinical Briefing
+│   ├── Nurse Actions
+│   └── Live Handoff
 │
-├── Safety engine
-│   ├── Emergency rules
-│   ├── Concern routing
-│   ├── Negation handling
-│   └── Clarification boundary
+├── Safety Engine
+│   ├── Emergency Rules
+│   ├── Concern Routing
+│   ├── Negation Handling
+│   └── Clarification Boundary
 │
 ├── Callsign
-│   ├── Agent identity
+│   ├── Agent Identity
 │   ├── Certificates
-│   ├── Transparency log
+│   ├── Transparency Log
 │   ├── Signatures
-│   └── Replay protection
+│   └── Replay Protection
 │
-├── Audit layer
+├── Audit Layer
 │
-└── Provider experience
+└── Provider Experience
 ```
 
 ---
 
-# Documentation
+## Documentation
 
-| Document                       | Contents                                                 |
-| ------------------------------ | -------------------------------------------------------- |
-| `AGENTS.md`                    | Development commands, layout and conventions             |
-| `docs/ARCHITECTURE.md`         | Data model, request flow, live updates and run isolation |
-| `docs/CALLING.md`              | Voice architecture and audio paths                       |
-| `docs/INTEGRATION.md`          | Integration architecture                                 |
-| `docs/INTEGRATION-CALLSIGN.md` | Callsign verification system                             |
-| `HANDOFF.md`                   | Implementation and verification notes                    |
-| `deploy/README.md`             | Infrastructure and deployment                            |
+| Document                       | Contents                                                  |
+| ------------------------------ | --------------------------------------------------------- |
+| `AGENTS.md`                    | Development commands, layout, and conventions             |
+| `docs/ARCHITECTURE.md`         | Data model, request flow, live updates, and run isolation |
+| `docs/CALLING.md`              | Voice architecture and audio paths                        |
+| `docs/INTEGRATION.md`          | Integration architecture                                  |
+| `docs/INTEGRATION-CALLSIGN.md` | Callsign verification system                              |
+| `HANDOFF.md`                   | Implementation and verification notes                     |
+| `deploy/README.md`             | Infrastructure and deployment                             |
 
-The full local API contains **27 documented endpoints**.
+The local API contains **27 documented endpoints**.
 
 ---
 
-# The Bigger Idea
+## The Bigger Idea
 
-Most healthcare AI systems start with:
+Many healthcare AI systems start with:
 
-> What can an AI model automate?
+> **What can an AI model automate?**
 
 Aftercare starts with a different question:
 
-> Where can intelligence reduce friction while preserving clear control, evidence, and accountability?
+> **Where can intelligence reduce friction while preserving control, evidence, and accountability?**
 
-The result is not just a chatbot.
+The result is more than a chatbot.
 
-It is a complete post-discharge workflow:
+It is a complete post-discharge workflow.
 
 ```text
 OUTREACH
@@ -857,26 +857,28 @@ The nurse gets a prioritized worklist.
 
 The provider gets a verified escalation.
 
-And every step between them remains inspectable.
+Every step between them remains inspectable.
 
 ---
 
-# Team
+## Team
 
-**[Team member]** — [GitHub / LinkedIn]
-**[Team member]** — [GitHub / LinkedIn]
-**[Team member]** — [GitHub / LinkedIn]
+**[Team Member]** — [GitHub] · [LinkedIn]
+**[Team Member]** — [GitHub] · [LinkedIn]
+**[Team Member]** — [GitHub] · [LinkedIn]
 
 ---
 
-# License
+## License
 
 MIT License
 
 ---
 
 <p align="center">
-  <strong>Aftercare</strong><br>
-  Post-discharge follow-up that reaches out first.<br><br>
-  Built at VT Hacks 14
+  <strong>Aftercare</strong>
+  <br>
+  Post-discharge follow-up that reaches out first.
+  <br><br>
+  <strong>Built at VT Hacks 14</strong>
 </p>
