@@ -148,6 +148,6 @@ export async function geminiRespond(callId: string, vars: CallVariables, heard: 
   }
 
   spoken = spoken.replace(/\s+/g, " ").replace(/[*_#`]/g, "").trim();
-  if (!spoken) spoken = end ? "Thanks, Dr. Patel. It's in your inbox. Have a good clinic." : "Sorry, could you say that again?";
+  if (!spoken) spoken = end ? `Thanks, ${doctor.name}. It's in your inbox. Have a good clinic.` : "Sorry, could you say that again?";
   return { reply: spoken, end };
 }

@@ -66,4 +66,6 @@ export interface DeskProviderStatus {
   elevenlabs: boolean;
   model: string;
   registry: DeskRegistry;
+  /** The receiver this agent protects; configured by HCP_DOCTOR_NAME / HCP_SPECIALTY. */
+  doctor: { name: string; specialty: string };
 }

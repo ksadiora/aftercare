@@ -9,6 +9,7 @@ import { createSimulationPlayback } from './simulation-audio';
 import { createNarrator, type Narrator } from './speech';
 import { ChatPanel } from './ChatPanel';
 import { Briefing } from './Briefing';
+import { EscalationGate } from './EscalationGate';
 import { HandoffRinging, HandoffStatus } from './HandoffPanel';
 import { joinHandoffAudio } from './handoff-media';
 import { createRingtone } from './ringtone';
@@ -153,7 +154,7 @@ export default function App() {
   async function action(kind: 'acknowledge' | 'resolve' | 'escalate' | 'callback', actionNote = '') {
     setBusy(true); setError('');
     try {
-      await api(`/patients/${selected}/actions`, { action: kind, note: actionNote });
+      await api(`/patients/${selected}/actions`, { action: kind, note: actionNote, nurse });
       const next = await refresh();
       setModal(null); setNote('');
       // A callback the nurse placed should not make them accept their own request
@@ -349,6 +350,7 @@ export default function App() {
           <aside className="detail-panel" ref={panelRef} aria-label="Patient details">
             {p ? <>
               <div className="detail-header"><div className="small-kicker">PATIENT DETAILS <span className="synthetic-pill">SYNTHETIC</span></div><div className="detail-person"><Avatar patient={p} large /><div><h2>{p.name}</h2><p>{p.age} years · {p.language === 'es' ? 'Spanish' : 'English'} preferred</p></div></div><div className="detail-status"><Badge patient={p} /><span>{p.disposition === 'open' ? 'Open case' : p.disposition}</span></div></div>
+              {(p.disposition === 'escalated' || thread.length > 0 || detail.escalation) && <EscalationGate patientId={p.id} mode="nurse" nurse={nurse} />}
               {thread.length > 0 && <section className="case-thread" aria-label="Conversation with the provider">
                 <span className="small-kicker"><Stethoscope size={13} /> PROVIDER CONVERSATION{thread.at(-1)?.role === 'provider' ? ' · AWAITING YOU' : ' · AWAITING THE PROVIDER'}</span>
                 <div className="case-messages">

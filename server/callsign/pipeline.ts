@@ -1,10 +1,9 @@
-import type { ReachRequest, VerificationResult, StepId, Outcome } from "@callsign/shared";
-import { emptyVerification } from "@callsign/shared";
+import type { ReachRequest, VerificationResult, StepId, Outcome } from "./types.js";
+import { emptyVerification, nowIso } from "./types.js";
 import fs from "node:fs";
 import { createHash, X509Certificate } from "node:crypto";
-import { config } from "../config.ts";
-import { nowIso } from "../events.ts";
-import { doctor } from "../seed/data.ts";
+import { config } from "./config.js";
+import { doctor } from "./identities.js";
 import {
   ANS_VERSION,
   ansMode,
@@ -24,11 +23,11 @@ import {
   type AnsRecords,
   type Badge,
   type CertInfo,
-} from "./ans.ts";
-import * as local from "./local-registry.ts";
-import { canonicalReach, publicKeyDerFor, publicKeyPemFor, verifyWithPublicKey } from "./sign.ts";
-import { checkFreshness, formatClock, markVerified, seenAt } from "./replay.ts";
-import { badgeEvidence, certEvidence, resolveEvidence, resolveMissEvidence, row, sha256hex, signatureEvidence, sourceRow, type Evidence } from "./evidence.ts";
+} from "./ans.js";
+import * as local from "./local-registry.js";
+import { canonicalReach, publicKeyDerFor, publicKeyPemFor, verifyWithPublicKey } from "./sign.js";
+import { checkFreshness, formatClock, markVerified, seenAt } from "./replay.js";
+import { badgeEvidence, certEvidence, resolveEvidence, resolveMissEvidence, row, sha256hex, signatureEvidence, sourceRow, type Evidence } from "./evidence.js";
 
 /**
  * VERIFICATION PIPELINE  (owner: Identity lane)
@@ -309,7 +308,7 @@ async function signatureStep(req: ReachRequest, key: { publicKeyPem: string; key
 function policyStep(req: ReachRequest): StepFn {
   return async () => {
     // Identity is settled by the time we get here; this is whether Dr. Patel wants the call now.
-    const { evaluatePolicy } = await import("../policy.ts");
+    const { evaluatePolicy } = await import("./policy.js");
     const r = evaluatePolicy({ specialty: req.payload.specialty, doctorSpecialty: doctor.specialty, doctorName: doctor.name, hasReceipt: true });
     return { ok: r.ok, detail: r.detail, evidence: [...r.evidence, sourceRow("doctor's policy · this server, live toggles from the Present sheet")] };
   };

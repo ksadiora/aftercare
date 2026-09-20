@@ -1,6 +1,4 @@
-import type { DoctorPolicy, PolicyUpdateBody } from "@callsign/shared";
-import { emit } from "./events.ts";
-import { audit } from "./store.ts";
+import type { DoctorPolicy, PolicyUpdateBody } from "./types.js";
 
 /**
  * THE DOCTOR'S POLICY
@@ -28,8 +26,6 @@ export function updatePolicy(patch: PolicyUpdateBody): DoctorPolicy {
   if (patch.note !== undefined) policy.note = patch.note ? String(patch.note).slice(0, 80) : undefined;
   if (!policy.acceptCalls && !policy.note) policy.note = "Calls are paused";
   if (policy.acceptCalls && policy.note === "Calls are paused") policy.note = undefined;
-  emit({ type: "policy.update", policy: getPolicy() });
-  audit("demo", `Policy: calls ${policy.acceptCalls ? "accepted" : "held"} · specialty only ${policy.specialtyOnly ? "on" : "off"}${policy.note ? ` · ${policy.note}` : ""}`);
   return getPolicy();
 }
 

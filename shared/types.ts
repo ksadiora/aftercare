@@ -51,9 +51,27 @@ export interface AuditEvent { id: number; patientId: string | null; sessionId: s
  * kept alongside it, so a case can never have a discussion the record does not show.
  */
 export interface CaseMessage { id: number; role: 'nurse' | 'provider'; author: string; text: string; at: string }
-export interface PatientDetail { patient: Patient; sessions: Session[]; turns: Turn[]; observations: Observation[]; audit: AuditEvent[]; thread: CaseMessage[] }
+export interface PatientDetail { patient: Patient; sessions: Session[]; turns: Turn[]; observations: Observation[]; audit: AuditEvent[]; thread: CaseMessage[]; escalation: EscalationRecord | null }
 export interface Dashboard { patients: Patient[]; activeSession: Session | null; runId: string; runNumber: number; recent: AuditEvent[]; handoff: Handoff | null; outreach: Outreach[]; /** Cases whose newest message came from a provider, so the worklist can say whose turn it is. */ awaitingNurse: string[] }
-export interface Capabilities { voice: boolean; voiceReason: string; maxSessionSeconds: number; chat: boolean; chatReason: string; model: string; handoff: boolean; handoffReason: string; ringSeconds: number; ans: boolean; ansReason: string; careTeam: string }
+export interface Capabilities { voice: boolean; voiceReason: string; maxSessionSeconds: number; chat: boolean; chatReason: string; model: string; handoff: boolean; handoffReason: string; ringSeconds: number; ans: boolean; ansReason: string; careTeam: string; escalationGate: boolean; escalationGateReason: string; providerAgentName: string; providerName: string; careTeamAgentName: string; registryMode: string }
+/**
+ * The escalation gate (server/callsign/): whether an escalation may reach the
+ * intended provider, with the evidence behind each check. Written to the case
+ * record beside the audit trail; it never changes urgency or disposition.
+ */
+export type EscalationStatus = 'verifying' | 'delivered' | 'held' | 'rejected';
+export interface EscalationStep { id: 'resolve' | 'certificate' | 'transparency' | 'signature' | 'policy' | 'content'; label: string; status: 'pending' | 'running' | 'pass' | 'fail' | 'skipped'; detail?: string; ms?: number; evidence?: { label: string; value: string; mono?: boolean }[] }
+export interface EscalationScreening { decision: 'allow' | 'block'; risk: 'low' | 'medium' | 'high'; summary: string; signals: { label: string; detail: string; quote?: string; severity: 'neutral' | 'warning' | 'danger' }[]; source: 'local' }
+export interface EscalationRecord {
+  id: string; runId: string; patientId: string; nurse: string; provider: string; providerAgent: string;
+  sender: string; senderDisplayName: string; requestId: string; status: EscalationStatus; reason: string | null;
+  steps: EscalationStep[]; screening: EscalationScreening | null; registry: { mode: string; base: string };
+  /** 'genuine' for a real escalation; the demo variants show what an attacker's copy looks like. */
+  variant: 'genuine' | 'spoof' | 'tamper' | 'replay';
+  note: string; summary: string | null; createdAt: string; updatedAt: string;
+}
+export interface ProviderPolicy { acceptCalls: boolean; specialtyOnly: boolean; note?: string }
+export interface EscalationView { enabled: boolean; reason: string; providerName: string; providerAgentName: string; careTeamAgentName: string; registryMode: string; escalation: EscalationRecord | null; policy: ProviderPolicy }
 export const severityOrder: Record<Severity, number> = { emergency: 0, red: 1, yellow: 2, unassessed: 3, green: 4 };
 export const severityLabels: Record<Severity, string> = { emergency: 'Emergency', red: 'Urgent review', yellow: 'Review today', unassessed: 'Not assessed', green: 'No concern detected' };
 export const scenarioLabels: Record<ScenarioId, string> = { wound: 'Wound concern', emergency: 'Emergency interrupt', transport: 'Transportation barrier', recovery: 'Uneventful recovery', interrupted: 'Interrupted contact', human: 'Request a person' };

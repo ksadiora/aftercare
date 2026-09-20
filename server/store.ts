@@ -2,7 +2,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { randomUUID } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import type { AuditEvent, CaseMessage, Dashboard, EndReason, Handoff, HandoffState, Language, Mode, Observation, Outreach, Patient, PatientDetail, QuestionId, ScenarioId, Session, Turn } from '../shared/types.js';
+import type { EscalationRecord, AuditEvent, CaseMessage, Dashboard, EndReason, Handoff, HandoffState, Language, Mode, Observation, Outreach, Patient, PatientDetail, QuestionId, ScenarioId, Session, Turn } from '../shared/types.js';
 import { severityOrder } from '../shared/types.js';
 import { messages, questionIds, questions } from '../shared/protocol.js';
 import { classify } from './triage.js';
@@ -29,6 +29,7 @@ export class Store {
       CREATE TABLE IF NOT EXISTS audit (id INTEGER PRIMARY KEY AUTOINCREMENT, runId TEXT NOT NULL, patientId TEXT, sessionId TEXT, kind TEXT NOT NULL, actor TEXT NOT NULL, text TEXT NOT NULL, createdAt TEXT NOT NULL, mode TEXT);
       CREATE TABLE IF NOT EXISTS handoffs (id TEXT PRIMARY KEY, runId TEXT NOT NULL, patientId TEXT NOT NULL, data TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS outreach (token TEXT PRIMARY KEY, runId TEXT NOT NULL, patientId TEXT NOT NULL, data TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS escalations (id TEXT PRIMARY KEY, runId TEXT NOT NULL, patientId TEXT NOT NULL, requestId TEXT NOT NULL, status TEXT NOT NULL, createdAt TEXT NOT NULL, data TEXT NOT NULL);
       CREATE INDEX IF NOT EXISTS outreach_run ON outreach(runId);
       CREATE INDEX IF NOT EXISTS handoffs_run ON handoffs(runId);
       CREATE INDEX IF NOT EXISTS audit_run ON audit(runId,id);
@@ -71,6 +72,8 @@ export class Store {
   providerQueue() {
     return this.db.prepare('SELECT data FROM patients WHERE runId=?').all(this.runId).map(r => parse<Patient>(r)!)
       .filter(p => p.disposition === 'escalated')
+      // Only escalations the gate delivered reach the provider. Held and rejected ones stay with the nurse, with the reason.
+      .filter(p => this.latestEscalation(p.id)?.status === 'delivered')
       .map(p => {
         const escalation = (this.db.prepare("SELECT * FROM audit WHERE runId=? AND patientId=? AND kind='escalate' ORDER BY id DESC LIMIT 1").get(this.runId, p.id) as unknown as AuditEvent | undefined);
         const reply = (this.db.prepare("SELECT * FROM audit WHERE runId=? AND patientId=? AND kind='provider_note' ORDER BY id DESC LIMIT 1").get(this.runId, p.id) as unknown as AuditEvent | undefined);
@@ -83,6 +86,7 @@ export class Store {
           summary: summary?.text ?? null, summarySource: summary?.actor ?? null,
           lastReply: reply?.text ?? null, repliedAt: reply?.createdAt ?? null,
           thread: this.caseThread(p.id),
+          escalation: this.latestEscalation(p.id),
         };
       })
       .sort((a, b) => String(b.escalatedAt).localeCompare(String(a.escalatedAt)));
@@ -107,6 +111,19 @@ export class Store {
     const p = this.patient(id);
     this.audit(id, null, 'provider_note', note, null, provider);
     return p;
+  }
+
+  /** The escalation gate's record for a case: one row per delivery attempt, newest wins. */
+  saveEscalation(record: EscalationRecord) {
+    if (!record.runId) record.runId = this.runId;
+    this.db.prepare('INSERT INTO escalations(id,runId,patientId,requestId,status,createdAt,data) VALUES(?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET status=excluded.status, data=excluded.data')
+      .run(record.id, record.runId, record.patientId, record.requestId, record.status, record.createdAt, JSON.stringify(record));
+  }
+  latestEscalation(patientId: string, runId = this.runId): EscalationRecord | null {
+    return parse<EscalationRecord>(this.db.prepare('SELECT data FROM escalations WHERE runId=? AND patientId=? ORDER BY createdAt DESC, rowid DESC LIMIT 1').get(runId, patientId)) ?? null;
+  }
+  escalationByRequest(requestId: string): EscalationRecord | null {
+    return parse<EscalationRecord>(this.db.prepare('SELECT data FROM escalations WHERE requestId=? ORDER BY rowid DESC LIMIT 1').get(requestId)) ?? null;
   }
 
   /** The nurse's side of that conversation. Like a provider note, it decides nothing. */
@@ -146,7 +163,7 @@ export class Store {
     const turns = sessions.flatMap(s => this.db.prepare('SELECT data FROM turns WHERE sessionId=? ORDER BY rowid').all(s.id).map(r => parse<Turn>(r)!));
     const observations = sessions.flatMap(s => this.db.prepare('SELECT data FROM observations WHERE sessionId=? ORDER BY rowid').all(s.id).map(r => parse<Observation>(r)!));
     const audit = this.db.prepare('SELECT * FROM audit WHERE runId=? AND patientId=? ORDER BY id DESC').all(this.runId, id) as unknown as AuditEvent[];
-    return { patient, sessions, turns, observations, audit, thread: this.caseThread(id) };
+    return { patient, sessions, turns, observations, audit, thread: this.caseThread(id), escalation: this.latestEscalation(id) };
   }
   history(runId?: string) {
     const runs = this.db.prepare('SELECT r.*, (SELECT COUNT(*) FROM sessions s WHERE s.runId=r.id) AS conversations FROM runs r ORDER BY number DESC').all();

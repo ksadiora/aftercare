@@ -243,6 +243,36 @@ authorise access to a patient record. **The resolve path has not been confirmed 
 registry** — set `ANS_RESOLVE_URL` from GoDaddy's own documentation once you have developer
 access rather than trusting the built-in default.
 
+## The escalation gate (Callsign, built in)
+
+An escalation no longer goes straight from the nurse to the provider. **Callsign**, a
+physician's-agent project merged into this codebase as a module, decides whether it may
+reach the intended doctor. When a nurse escalates, Aftercare records the nurse note and
+the attributed automated summary as before, then the gate signs the escalation as the
+care-team service identity (`careteam.aftercare.work`) and verifies it as the provider's
+agent (`lee.callsign-hcp.com`, Dr. Morgan Lee): ANS name resolution, certificate,
+transparency-log receipt, signature and replay window, the provider's own policy, and a
+content screen adapted to clinical escalations. Every check keeps its evidence.
+
+- **Delivered**: the case appears on `/provider` with the verification evidence next to the
+  nurse's note and the summary; the provider replies into the same thread as before.
+- **Held**: the provider's policy said not now (the toggle on the provider page). The nurse
+  sees the reason on the case and can retry delivery later. The case stays open.
+- **Rejected**: an identity, signature, replay or content check stopped it. The nurse sees
+  which one; the provider was never contacted. Three demo buttons on the nurse's case send an
+  attacker's copy of the last escalation (spoofed sender, tampered message, replayed message)
+  through the same gate.
+
+The registry is this server's own ANS-shaped registry (a private CA, X.509 identity
+certificates, a Merkle transparency log with signed checkpoints), served read-only at
+`/ans/*` so a judge can inspect it; `GET /api/proof/<requestId>` returns any decision with
+its evidence. No keys or network are needed. Nothing here changes urgency, disposition, or
+emergency handling: rules still decide urgency and only a nurse closes a case. See
+[docs/INTEGRATION-CALLSIGN.md](docs/INTEGRATION-CALLSIGN.md). The original Callsign project
+is vendored unchanged at `callsign/` (`npm run agent` runs it standalone), and
+[Codi's Cove](codis-cove/README.md), a separate side project from the same team, is linked
+from the landing page (`npm run cove`).
+
 ## Deploying beyond this laptop
 
 The server still binds to loopback and answers only for localhost by default. A deployment must

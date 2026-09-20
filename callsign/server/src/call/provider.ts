@@ -64,7 +64,7 @@ export async function placeCall(req: ReachRequest, toE164: string): Promise<Call
   const call: CallState = {
     id: id("call"),
     requestId: req.id,
-    to: config.calls.provider === "app" ? "Dr. Patel's phone" : maskPhone(toE164),
+    to: config.calls.provider === "app" ? `${doctor.name}'s phone` : maskPhone(toE164),
     provider: effectiveModes().calls === "mock" ? "mock" : config.calls.provider,
     callerName: req.claimedDisplayName,
     callerAgent: req.from,
@@ -150,7 +150,7 @@ export function callDeliveryAllowed(callId: string): boolean {
   const call = getCall(callId);
   if (!call || isCallFinished(callId)) return false;
   const request = getRequest(call.requestId);
-  const policy = evaluatePolicy({ specialty: request?.payload.specialty, doctorSpecialty: doctor.specialty, hasReceipt: true });
+  const policy = evaluatePolicy({ specialty: request?.payload.specialty, doctorSpecialty: doctor.specialty, doctorName: doctor.name, hasReceipt: true });
   if (!request || !policy.ok) {
     setCallStatus(callId, "ended", { endReason: "declined", error: request ? policy.detail : "Verified request is no longer available." });
     return false;
