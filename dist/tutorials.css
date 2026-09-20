@@ -1,0 +1,183 @@
+body.third-person dialog.tutorial-dialog { width:min(1120px,calc(100vw - 32px)); }
+.tutorial-dialog .dialog-inner { padding:30px; }
+.tutorial-heading { padding-right:22px; }
+.tutorial-heading h2 { font-size:29px; margin-bottom:18px; }
+.tutorial-step-track { display:flex; align-items:center; max-width:240px; margin-bottom:25px; }
+.tutorial-step-track span { display:grid; place-items:center; border:1px solid #ccd8c7; width:29px; height:29px; border-radius:50%; font-size:14px; font-weight:800; color:#73816f; }
+.tutorial-step-track i { height:2px; flex:1; background:#d8dfd0; }
+.tutorial-step-track .current { background:#234e42; border-color:#234e42; color:white; box-shadow:0 0 0 4px #234e4210; }
+.tutorial-step-track .finished { background:#ddecc5; color:#214e43; }
+.tutorial-layout { display:grid; grid-template-columns:235px minmax(0,1fr); gap:28px; align-items:start; }
+.tutorial-coach img { width:88px; height:88px; object-fit:contain; display:block; margin-bottom:14px; border-radius:16px; }
+.tutorial-coach h3 { font-size:23px; margin:10px 0; line-height:1.2; letter-spacing:-.5px; }
+.tutorial-coach p { font-size:16px; color:#53705f; line-height:1.6; }
+.tutorial-mission { background:#e5edcf; border-radius:15px; padding:16px; margin-top:22px; }
+.tutorial-mission span { display:block; font-size:12px; font-weight:800; letter-spacing:1.4px; margin-bottom:7px; }
+.tutorial-mission strong { display:block; line-height:1.45; font-size:16px; }
+.tutorial-done { color:#23654a!important; font-weight:700; }
+.tutorial-screen { min-width:0; }
+.tutorial-target { outline:3px solid #e9b064; outline-offset:3px; }
+.tutorial-footer { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:24px; border-top:1px solid #dce4d3; padding-top:14px; }
+.tutorial-footer>div { display:flex; gap:16px; }
+.tutorial-action-hint { color:#627660; font-size:14px; text-align:right; }
+.tutorial-reference { color:#73806d; font-size:13px; margin:16px 0 0; }
+.tutorial-reference a { color:#365948; text-underline-offset:3px; }
+.app-demo-label { font-size:11px; font-weight:800; letter-spacing:.7px; }
+.bank-app { border-radius:18px; overflow:hidden; background:#f4f7fa; box-shadow:0 12px 35px #13312b18; border:1px solid #dce3e8; color:#18394c; }
+.bank-app-top { background:#16384c; color:#fff; padding:17px 24px; display:flex; align-items:center; gap:10px; }
+.bank-app-logo { display:grid; place-items:center; background:#cde8e1; color:#17394b; width:30px; height:30px; border-radius:9px; font-weight:900; font-size:25px; }
+.bank-app-top strong { font-size:21px; letter-spacing:-.6px; }
+.bank-app-top>span:last-child { margin-left:auto; font-size:12px; color:#c5d8df; }
+.bank-app-body { padding:26px; min-height:356px; }
+.app-breadcrumb { font-size:13px; color:#6e808d; margin-bottom:20px; }
+.bank-app h3 { font-family:Arial,sans-serif; font-size:24px; line-height:1.2; color:#193b4e; margin:0 0 8px; letter-spacing:-.4px; }
+.bank-app .app-muted { color:#5a7280; font-size:14px; line-height:1.5; }
+.practice-accounts { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:24px 0; }
+.practice-accounts>div,.practice-accounts>button { text-align:left; background:white; padding:20px; border:1px solid #dbe4eb; border-radius:13px; display:grid; gap:13px; color:#18394c; }
+.practice-accounts strong { font-size:31px; letter-spacing:-1px; }
+.practice-accounts small { font-size:14px; font-weight:400; letter-spacing:0; }
+.practice-accounts span:first-child { font-weight:700; }
+.practice-accounts span:last-child { font-size:13px; color:#657887; }
+.practice-accounts b { float:right; }
+.bank-goal { display:flex; gap:15px; background:#e6f0ed; border-radius:12px; padding:17px; }
+.bank-goal>span { font-size:29px; }
+.bank-goal>div { flex:1; }
+.bank-goal p { margin:5px 0 10px; font-size:14px; }
+.app-progress { height:6px; background:#c9ded7; border-radius:9px; }
+.app-progress i { display:block; width:0; height:100%; }
+.bank-app footer { padding:13px 22px; background:#e8eef2; display:flex; flex-wrap:wrap; gap:6px 12px; color:#4f6978; }
+.bank-app footer>span:last-child { font-size:12px; }
+.transfer-route { display:flex; align-items:center; gap:14px; border:1px solid #dce4e9; border-radius:12px; background:white; padding:20px; margin:24px 0; }
+.transfer-route>span { display:grid; gap:7px; flex:1; font-size:13px; color:#5c7280; }
+.transfer-route strong { font-size:19px; color:#19394c; }
+.transfer-route small { font-size:13px; }
+.practice-amount { border:0; padding:0; margin:20px 0 8px; display:flex; gap:10px; }
+.practice-amount legend { font-size:14px; font-weight:700; margin-bottom:12px; }
+.practice-amount label { border:1px solid #cddae3; background:#fff; border-radius:10px; padding:13px 10px; flex:1; font-size:15px; text-align:center; cursor:pointer; }
+.practice-amount label.selected { border-color:#245d79; background:#e2eff6; box-shadow:inset 0 0 0 1px #245d79; }
+.practice-amount input { margin:0 5px 0 0; accent-color:#245d79; }
+.bank-app-primary { display:block; width:100%; background:#184d6a; color:#fff; border-radius:11px; padding:15px; font-weight:700; text-align:left; margin-top:23px; }
+.bank-app-primary span { float:right; }
+.app-inline-feedback { color:#825125; font-size:14px; }
+.practice-review { margin:20px 0; border-top:1px solid #d9e2e8; }
+.practice-review>span { padding:13px 0; border-bottom:1px solid #d9e2e8; display:flex; justify-content:space-between; gap:15px; font-size:14px; }
+.practice-review strong { text-align:right; }
+.bank-receipt-head { display:flex; align-items:center; gap:13px; }
+.bank-receipt-head>span { width:39px; height:39px; border-radius:50%; background:#d9ece3; display:grid; place-items:center; font-size:23px; flex-shrink:0; }
+.bank-receipt-head h3 { font-size:20px; }
+.bank-receipt-head p { margin:4px 0 0; font-size:14px; }
+.bank-app h4 { font-size:14px; margin:26px 0 13px; }
+.practice-transaction { display:flex; align-items:center; width:100%; gap:12px; padding:15px 12px; background:white; border:1px solid #d9e3e9; border-radius:10px; color:inherit; text-align:left; }
+.practice-transaction>span:nth-child(2) { flex:1; }
+.practice-transaction small { display:block; font-size:12px; font-weight:400; margin-top:5px; color:#667d8a; }
+.practice-transaction strong { font-size:14px; }
+.transaction-icon { display:grid; place-items:center; background:#e3eeea; width:29px; height:29px; border-radius:50%; }
+.practice-receipt { background:#e7f0ea; padding:15px; border-radius:10px; margin-top:16px; font-size:14px; }
+.practice-receipt p { margin:8px 0 0; }
+.bank-bridge { margin-top:22px; font-size:14px; }
+.bank-bridge>p { margin:7px 0 12px; }
+.tutorial-live-card { background:#fff; border:1px solid #d6e2dc; border-radius:10px; padding:14px; }
+.tutorial-live-card>span { display:block; color:#4b735f; font-size:11px; font-weight:800; letter-spacing:.7px; margin-bottom:9px; }
+.tutorial-live-card>strong { display:block; font-size:15px; }
+.tutorial-live-card p { margin:5px 0; font-size:14px; }
+.tutorial-live-card small { color:#67776d; font-size:12px; }
+.tutorial-connection-note { font-size:14px; color:#627467; }
+.notion-app { display:grid; grid-template-columns:145px minmax(0,1fr); background:#fff; border:1px solid #dddcd7; border-radius:10px; overflow:hidden; min-height:440px; color:#37352f; font-family:Arial,sans-serif; box-shadow:0 12px 35px #13312b12; }
+.notion-sidebar { background:#f5f5f2; padding:16px 9px; display:flex; flex-direction:column; gap:7px; }
+.notion-sidebar>strong { font-size:13px; margin:0 0 16px; display:flex; align-items:center; gap:6px; }
+.notion-mark { border:1.5px solid #383631; border-radius:3px; background:white; font:700 16px Georgia,serif; width:19px; height:21px; display:grid; place-items:center; }
+.notion-sidebar-muted { font-size:12px; color:#77766e; padding:7px 5px; }
+.notion-sidebar>small { font-size:10px; color:#8e8c83; margin:17px 5px 4px; }
+.notion-sidebar button { padding:8px 6px; border-radius:4px; text-align:left; font-size:14px; background:transparent; color:#37352f; }
+.notion-sidebar button.active { background:#e8e7e2; font-weight:700; }
+.notion-content { min-width:0; display:flex; flex-direction:column; }
+.notion-content>header { display:flex; justify-content:space-between; gap:12px; padding:15px 18px; color:#77766e; font-size:12px; border-bottom:1px solid #f0efeb; }
+.notion-page { padding:22px; flex:1; }
+.notion-page-icon { font-size:29px; margin-bottom:14px; }
+.notion-page h3 { font-family:Arial,sans-serif; color:#37352f; font-size:27px; line-height:1.15; letter-spacing:-.6px; margin:0 0 12px; }
+.notion-page>p { font-size:14px; line-height:1.55; color:#67665e; }
+.notion-empty-page { margin-top:32px; padding:22px; border:1px dashed #d7d6cd; border-radius:5px; }
+.notion-empty-page>span { display:block; font-size:26px; margin-bottom:15px; }
+.notion-empty-page strong { font-size:16px; }
+.notion-empty-page p { font-size:14px; margin-bottom:0; }
+.notion-callout { display:flex; align-items:start; gap:12px; background:#f7f4e9; border-radius:4px; padding:12px; margin:19px 0; font-size:13px; line-height:1.5; }
+.notion-callout strong { font-weight:400; color:#6f6b59; }
+.notion-view-tabs { border-bottom:1px solid #dad9d2; display:flex; justify-content:space-between; font-size:12px; padding:0 0 10px; gap:10px; }
+.notion-view-tabs>span:first-child { font-weight:700; }
+.notion-view-tabs>span:last-child { color:#939186; }
+.notion-table-wrap { width:100%; }
+.notion-table { border-collapse:collapse; width:100%; font-size:14px; table-layout:fixed; }
+.notion-table th { color:#77766d; font-weight:400; text-align:left; padding:10px 5px; }
+.notion-table th:first-child { width:57%; }
+.notion-table th:nth-child(2) { width:27%; }
+.notion-table th:nth-child(3) { width:16%; }
+.notion-table td { border-top:1px solid #eeede8; padding:11px 5px; vertical-align:middle; overflow-wrap:anywhere; line-height:1.4; }
+.notion-table td+td { border-left:1px solid #eeede8; }
+.notion-highlight { background:#fcf6e9; }
+.notion-row-link { background:transparent; color:#37352f; text-align:left; padding:2px; font-size:14px; line-height:1.5; width:100%; }
+.notion-row-link span { font-size:11px; }
+.notion-date { background:#f0e9dc; padding:2px 3px; border-radius:3px; }
+.notion-table input,.notion-checklist input { accent-color:#3286c7; width:17px; height:17px; cursor:pointer; }
+.notion-properties { display:grid; grid-template-columns:90px 1fr; gap:15px; font-size:13px; margin:22px 0; padding-bottom:20px; border-bottom:1px solid #ecebe4; }
+.notion-properties>span:nth-child(odd) { color:#8b887e; }
+.notion-properties strong { font-weight:400; }
+.notion-checklist { display:grid; gap:14px; margin:24px 0; }
+.notion-checklist label { display:flex; gap:10px; align-items:center; font-size:15px; cursor:pointer; }
+.notion-checklist input { margin:0; }
+.notion-checklist .checked { text-decoration:line-through; color:#9b988e; }
+.notion-checklist-feedback { font-size:13px; color:#727568; min-height:35px; line-height:1.5; }
+.notion-continue { padding:11px 13px; border:1px solid #d9d8d0; background:#fafaf8; border-radius:5px; font-size:13px; margin-top:17px; color:#47453e; }
+.notion-real-bridge { font-size:14px; }
+.notion-real-bridge>p { font-size:13px; }
+.notion-content>footer { border-top:1px solid #ecebe7; padding:11px 16px; display:grid; gap:5px; color:#858276; font-size:11px; }
+.tutorial-entry { margin:18px 0; padding:16px; border:1px solid #dce4cc; background:#eff3e4; border-radius:14px; display:flex; align-items:center; justify-content:space-between; gap:14px; }
+.tutorial-entry strong { display:block; font-size:16px; }
+.tutorial-entry p { font-size:14px; margin:5px 0 0; color:#61745c; }
+.tutorial-entry button { flex-shrink:0; }
+.tutorial-library { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:20px 0; }
+.tutorial-library button { background:#edf1e3; border:1px solid #dce4d0; border-radius:15px; padding:22px; text-align:left; }
+.tutorial-library span { display:block; font-size:30px; margin-bottom:14px; }
+.tutorial-library strong { display:block; font-size:18px; }
+.tutorial-library small { display:block; margin-top:10px; font-size:14px; line-height:1.55; color:#60745b; }
+@media(min-width:700px) { .notion-table,.notion-row-link { font-size:14px; } }
+@media(max-width:950px) { .tutorial-layout { grid-template-columns:195px minmax(0,1fr); gap:20px; } .notion-app { grid-template-columns:115px minmax(0,1fr); } .notion-page { padding:18px 14px; } .bank-app-body { padding:22px; } }
+@media(max-width:720px) {
+ body.third-person dialog.tutorial-dialog { width:calc(100vw - 20px); max-height:calc(100svh - 24px); }
+ .tutorial-dialog .dialog-inner { padding:23px 17px; }
+ .tutorial-heading h2 { font-size:25px; }
+ .tutorial-layout { display:flex; flex-direction:column; gap:20px; }
+ .tutorial-coach { width:100%; display:grid; grid-template-columns:52px 1fr; gap:4px 12px; }
+ .tutorial-coach img { width:52px; height:52px; margin:0; grid-row:1/3; }
+ .tutorial-coach h3 { font-size:21px; margin:3px 0; }
+ .tutorial-coach p,.tutorial-coach .tutorial-mission { grid-column:1/-1; margin:8px 0 0; }
+ .tutorial-coach p { font-size:15px; }
+ .tutorial-mission { padding:13px; }
+ .tutorial-mission span { display:inline; margin-right:9px; }
+ .tutorial-mission strong { display:inline; font-size:15px; }
+ .tutorial-screen { width:100%; }
+ .tutorial-step-track { margin-bottom:20px; }
+ .tutorial-footer { flex-direction:column; align-items:stretch; }
+ .tutorial-footer>div { justify-content:space-between; }
+ .tutorial-action-hint { text-align:left; }
+ .tutorial-reference { font-size:12px; line-height:1.5; }
+ .bank-app-body { padding:20px 17px; }
+ .practice-accounts { gap:12px; }
+ .practice-accounts>div,.practice-accounts>button { padding:16px 12px; }
+ .bank-app-top { padding:15px 18px; }
+ .bank-app-top>span:last-child { font-size:11px; }
+ .practice-amount { gap:7px; }
+ .practice-amount label { padding:12px 5px; font-size:14px; }
+ .practice-amount input { margin-right:3px; }
+ .notion-app { grid-template-columns:1fr; }
+ .notion-sidebar { display:flex; flex-direction:row; flex-wrap:wrap; gap:8px; align-items:center; padding:12px; border-bottom:1px solid #e5e3dc; }
+ .notion-sidebar>strong { margin:0; flex:1; font-size:13px; }
+ .notion-sidebar>small,.notion-sidebar-muted { display:none; }
+ .notion-sidebar button { padding:8px; }
+ .notion-page { padding:20px 14px; }
+ .notion-table,.notion-row-link { font-size:14px; }
+ .notion-table th:first-child { width:55%; }
+ .notion-table th:nth-child(2) { width:29%; }
+ .tutorial-entry { align-items:stretch; flex-direction:column; }
+ .tutorial-entry button { align-self:start; }
+ .tutorial-library { grid-template-columns:1fr; }
+}
