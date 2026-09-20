@@ -4,7 +4,9 @@ Written 19 September 2026, end of the build session. For whoever picks this up n
 another Claude session, a teammate, or you in six hours. Read this before changing anything.
 
 Related docs: `README.md` (how the app behaves), `deploy/README.md` (infrastructure),
-`SPONSOR-INTEGRATION-STATUS.md` (what was built during the hackathon, for the submission).
+`SPONSOR-INTEGRATION-STATUS.md` (what was built during the hackathon, for the submission),
+**`HANDOFF-INTEGRATION.md` (the Callsign escalation gate merged on branch `integrate-callsign`:
+every file changed, how to run and deploy it, what was and was not tested).**
 
 ---
 

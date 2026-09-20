@@ -11,6 +11,7 @@ A synthetic post-discharge follow-up demonstration. Nurses get a risk-sorted wor
 | [docs/CALLING.md](docs/CALLING.md) | **The calling system**, in depth — four audio paths and why they differ |
 | [docs/INTEGRATION.md](docs/INTEGRATION.md) | Merging another project in without breaking this one |
 | [HANDOFF.md](HANDOFF.md) | What is verified, what is not, and claims that would be false |
+| [HANDOFF-INTEGRATION.md](HANDOFF-INTEGRATION.md) | The Callsign escalation gate: what changed, how to run and deploy it, what to test |
 | [deploy/README.md](deploy/README.md) | Infrastructure |
 
 Everything below is how the product behaves and how to run it.
