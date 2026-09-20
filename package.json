@@ -1,0 +1,40 @@
+{
+  "name": "callsign",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A personal AI agent screens incoming conversations before they reach a doctor.",
+  "workspaces": [
+    "shared",
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,web -c green,cyan \"npm run dev -w server\" \"npm run dev -w web\"",
+    "dev:ssl": "concurrently -n server,web -c green,cyan \"npm run dev -w server\" \"npm run dev:ssl -w web\"",
+    "build": "npm run build -w web && npm run build -w server",
+    "start": "npm run start -w server",
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w web",
+    "lint": "eslint . --max-warnings 0",
+    "impostor": "npm run impostor -w server",
+    "scenarios": "npm run scenarios -w server",
+    "register-ans": "npm run register-ans -w server",
+    "tunnel": "node scripts/tunnel.mjs",
+    "test": "node scripts/test.mjs",
+    "scenarios:ci": "node scripts/scenarios-ci.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "concurrently": "^9.1.2",
+    "eslint": "^10.11.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^16.5.0",
+    "typescript-eslint": "^8.46.4"
+  },
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "esbuild@0.25.12": true
+  }
+}
