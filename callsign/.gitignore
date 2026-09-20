@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+server/keys/*.pem
+server/keys/*.key
+server/keys/*.json
+!server/keys/.gitkeep
+
+.codex-work/

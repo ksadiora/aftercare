@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web-nossl",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "set VITE_NO_SSL=1&& set PATH=C:\Program Files\nodejs;%PATH%&& npm run dev -w web"],
+      "port": 5173
+    },
+    {
+      "name": "web-test",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "set VITE_PORT=5174&& set VITE_API_PORT=8791&& set PATH=C:\Program Files\nodejs;%PATH%&& npm run dev -w web"],
+      "port": 5174
+    }
+  ]
+}

@@ -1,0 +1,1408 @@
+/* The doctor's phone (/phone). An iOS call screen, not a web page. */
+
+.ph {
+  --ph-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, "Segoe UI", sans-serif;
+  --ph-text: #ffffff;
+  --ph-text-2: rgba(255, 255, 255, 0.6);
+  --ph-text-3: rgba(255, 255, 255, 0.38);
+  --ph-green: #30d158;
+  --ph-red: #ff3b30;
+  --ph-blue: #0a84ff;
+  --ph-amber: #ff9f0a;
+  --ph-gray: #8e8e93;
+  --ph-glass: rgba(255, 255, 255, 0.12);
+  --ph-glass-2: rgba(255, 255, 255, 0.2);
+  --ph-pad-top: max(28px, env(safe-area-inset-top));
+  --ph-pad-bottom: max(28px, calc(env(safe-area-inset-bottom) + 12px));
+  --ph-pad-x: max(24px, env(safe-area-inset-left), env(safe-area-inset-right));
+
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  font-family: var(--ph-font);
+  color: var(--ph-text);
+  background: #000;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+
+.ph button {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: pointer;
+}
+
+.ph::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 40% at 50% 22%, rgba(90, 120, 170, 0.35), transparent 70%),
+    linear-gradient(180deg, #0c0c0e 0%, #1c1c1e 100%);
+  transition: background 600ms ease;
+}
+
+.ph[data-stage="ringing"]::before {
+  background:
+    radial-gradient(70% 45% at 50% 24%, rgba(48, 209, 88, 0.22), transparent 70%),
+    radial-gradient(60% 40% at 50% 70%, rgba(80, 100, 150, 0.18), transparent 70%),
+    linear-gradient(180deg, #000 0%, #1c1c1e 100%);
+}
+
+.ph[data-stage="incall"]::before {
+  background:
+    radial-gradient(70% 45% at 50% 18%, rgba(70, 110, 190, 0.28), transparent 70%),
+    linear-gradient(180deg, #050506 0%, #1c1c1e 100%);
+}
+
+.ph[data-stage="ended"]::before {
+  background:
+    radial-gradient(70% 45% at 50% 40%, rgba(48, 209, 88, 0.14), transparent 70%),
+    linear-gradient(180deg, #050506 0%, #1c1c1e 100%);
+}
+
+.ph-screen {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--ph-pad-top) var(--ph-pad-x) var(--ph-pad-bottom);
+  animation: ph-fade 320ms ease-out;
+}
+
+@keyframes ph-fade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ph-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  margin-top: 8vh;
+}
+
+.ph-kicker {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ph-text-2);
+  letter-spacing: 0.01em;
+}
+
+.ph-name {
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* The caller's ANS name (an FQDN), under the display name. */
+.ph-ans {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 13px;
+  color: var(--ph-text-2);
+  letter-spacing: 0.01em;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.ph-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 15px;
+  color: var(--ph-text-2);
+}
+
+.ph-verified svg {
+  width: 18px;
+  height: 18px;
+  color: var(--ph-green);
+  flex: none;
+}
+
+.ph-verified b {
+  color: var(--ph-text);
+  font-weight: 500;
+}
+
+/* The shield draws itself in: outline over 400 ms, check right after, then the fill. */
+.ph-shield-draw .outline,
+.ph-shield-draw .check {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  fill: none;
+}
+
+.ph-shield-draw .outline {
+  animation: ph-draw 400ms ease-out forwards;
+}
+
+.ph-shield-draw .check {
+  animation: ph-draw 220ms ease-out 360ms forwards;
+}
+
+.ph-shield-draw .fill {
+  opacity: 0;
+  animation: ph-fill 300ms ease-out 520ms forwards;
+}
+
+.ph-shield-draw .check {
+  stroke: #fff;
+  stroke-width: 2.2;
+}
+
+@keyframes ph-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ph-fill {
+  to {
+    opacity: 1;
+  }
+}
+
+.ph-spacer {
+  flex: 1;
+}
+
+/* ---------------------------------------------------------------- */
+/* Round buttons                                                     */
+/* ---------------------------------------------------------------- */
+
+.ph-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 320px;
+  padding: 0 8px;
+  margin-top: 24px;
+}
+
+.ph-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--ph-text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ph-action:disabled {
+  opacity: 0.5;
+}
+
+.ph-circle {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--ph-glass);
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+.ph-circle svg {
+  width: 32px;
+  height: 32px;
+}
+
+.ph-action:active .ph-circle {
+  transform: scale(0.92);
+  filter: brightness(1.15);
+}
+
+.ph-circle.green {
+  background: var(--ph-green);
+}
+
+.ph-circle.red {
+  background: var(--ph-red);
+}
+
+.ph-circle.small {
+  width: 64px;
+  height: 64px;
+}
+
+.ph-circle.small svg {
+  width: 26px;
+  height: 26px;
+}
+
+.ph-circle.on {
+  background: #fff;
+  color: #111;
+}
+
+.ph[data-stage="ringing"] .ph-circle.green {
+  animation: ph-accept 1.6s ease-in-out infinite;
+}
+
+@keyframes ph-accept {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(48, 209, 88, 0.55);
+  }
+  60% {
+    box-shadow: 0 0 0 18px rgba(48, 209, 88, 0);
+  }
+}
+
+/* "Tap to enable sound": only when the audio context was parked before a ring. */
+.ph-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  background: #ffd60a;
+  animation: ph-caption 260ms ease-out;
+}
+
+.ph-banner svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---------------------------------------------------------------- */
+/* Pairing                                                           */
+/* ---------------------------------------------------------------- */
+
+.ph-mark {
+  width: 84px;
+  height: 84px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(160deg, #2f7cf6, #0a84ff 60%, #0a5ed6);
+  box-shadow: 0 12px 40px rgba(10, 132, 255, 0.35);
+  margin-bottom: 18px;
+}
+
+.ph-mark svg {
+  width: 44px;
+  height: 44px;
+}
+
+.ph-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.ph-sub {
+  font-size: 16px;
+  color: var(--ph-text-2);
+  max-width: 300px;
+  line-height: 1.4;
+}
+
+.ph-field {
+  width: 100%;
+  max-width: 320px;
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ph-field label {
+  font-size: 13px;
+  color: var(--ph-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-left: 4px;
+}
+
+.ph-input {
+  width: 100%;
+  border: 0;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font: inherit;
+  font-size: 17px;
+  color: var(--ph-text);
+  background: var(--ph-glass);
+  outline: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.ph-input:focus {
+  background: var(--ph-glass-2);
+}
+
+.ph-primary {
+  width: 100%;
+  max-width: 320px;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 999px;
+  padding: 17px 20px;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--ph-blue);
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+.ph-primary:active {
+  transform: scale(0.98);
+  filter: brightness(1.1);
+}
+
+.ph-primary:disabled {
+  opacity: 0.55;
+}
+
+.ph-hint {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--ph-text-3);
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------- */
+/* Idle                                                              */
+/* ---------------------------------------------------------------- */
+
+.ph-radar {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  display: grid;
+  place-items: center;
+  margin: 6vh 0 26px;
+}
+
+.ph-radar .ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(48, 209, 88, 0.7);
+  animation: ph-ring 3.2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+.ph-radar .ring:nth-child(2) {
+  animation-delay: 1.05s;
+}
+
+.ph-radar .ring:nth-child(3) {
+  animation-delay: 2.1s;
+}
+
+@keyframes ph-ring {
+  0% {
+    transform: scale(0.42);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+}
+
+.ph-radar .core {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(48, 209, 88, 0.16);
+  color: var(--ph-green);
+  animation: ph-breathe 3.2s ease-in-out infinite;
+}
+
+.ph-radar .core svg {
+  width: 30px;
+  height: 30px;
+}
+
+@keyframes ph-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.ph-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ph-text-3);
+}
+
+.ph-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ph-green);
+  box-shadow: 0 0 0 3px rgba(48, 209, 88, 0.18);
+}
+
+.ph-dot.off {
+  background: #ff9f0a;
+  box-shadow: 0 0 0 3px rgba(255, 159, 10, 0.18);
+}
+
+.ph-link {
+  background: none;
+  border: 0;
+  padding: 10px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ph-blue);
+}
+
+/* ---------------------------------------------------------------- */
+/* In call                                                           */
+/* ---------------------------------------------------------------- */
+
+.ph-callhead {
+  position: relative;
+  z-index: 2; /* captions slide under it, never over it */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  width: 100%;
+  text-align: center;
+}
+
+.ph-callhead .ph-name {
+  font-size: 26px;
+}
+
+.ph-callhead .ph-verified {
+  font-size: 13px;
+  max-width: 100%;
+}
+
+.ph-callhead .ph-verified span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ph-timer {
+  font-size: 17px;
+  color: var(--ph-text-2);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: 0.02em;
+}
+
+.ph-timer.big {
+  font-size: 44px;
+  font-weight: 300;
+  color: var(--ph-text);
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+}
+
+.ph-captions {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  padding: 16px 4px 12px;
+  min-height: 56px;
+  overflow: hidden; /* captions stay inside their band; the newest line is always visible */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 28px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 28px);
+}
+
+.ph-captions > * {
+  flex-shrink: 0;
+}
+
+.ph-agentline {
+  font-size: clamp(16px, 5vw, 21px);
+  line-height: 1.35;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  animation: ph-caption 260ms ease-out;
+}
+
+/* Long lines (the opening pitch) step down so the whole thought fits above the orb. */
+.ph-agentline[data-long="1"] {
+  font-size: clamp(15px, 4.4vw, 18px);
+  line-height: 1.3;
+}
+
+.ph-doctorline {
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--ph-text-2);
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  animation: ph-caption 260ms ease-out;
+}
+
+.ph-doctorline.interim {
+  color: var(--ph-text-3);
+  font-style: italic;
+}
+
+.ph-doctorline::before {
+  content: "You · ";
+  color: var(--ph-text-3);
+  font-style: normal;
+}
+
+@keyframes ph-caption {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Three quiet dots while a turn is in flight. */
+.ph-dots {
+  display: inline-flex;
+  gap: 6px;
+  padding: 6px 0 2px;
+  animation: ph-caption 260ms ease-out;
+}
+
+.ph-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ph-amber);
+  opacity: 0.35;
+  animation: ph-dot 1.2s ease-in-out infinite;
+}
+
+.ph-dots i:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.ph-dots i:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+@keyframes ph-dot {
+  0%,
+  70%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* The orb                                                           */
+/* ---------------------------------------------------------------- */
+
+.ph-orbwrap {
+  --orb: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 6px;
+  flex: none;
+}
+
+/* Typing: the keyboard and the field need the room more than the orb does. */
+.ph[data-mic="text"] .ph-orbwrap {
+  --orb: 104px;
+  gap: 6px;
+  margin: 0;
+}
+
+.ph-orb {
+  position: relative;
+  width: var(--orb);
+  height: var(--orb);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ph-gray);
+  -webkit-tap-highlight-color: transparent;
+  transition: color 450ms ease;
+}
+
+.ph-orb[data-mode="speaking"] {
+  color: var(--ph-blue);
+}
+
+.ph-orb[data-mode="listening"] {
+  color: var(--ph-green);
+}
+
+.ph-orb[data-mode="thinking"] {
+  color: var(--ph-amber);
+}
+
+.ph-orb:disabled {
+  opacity: 1;
+}
+
+.ph-orb:active .sphere {
+  filter: brightness(1.12);
+}
+
+/* Soft glow behind the sphere; scale + opacity are set per frame from the audio level. */
+.ph-orb .halo {
+  position: absolute;
+  inset: -14%;
+  border-radius: 50%;
+  background: radial-gradient(circle, currentColor 0%, rgba(0, 0, 0, 0) 68%);
+  opacity: 0.4;
+  transform: scale(1.1);
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.ph-orb .sphere {
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow:
+    inset 0 -18px 30px rgba(0, 0, 0, 0.35),
+    inset 0 6px 16px rgba(255, 255, 255, 0.18),
+    0 18px 40px rgba(0, 0, 0, 0.45);
+  will-change: transform;
+  transition: filter 120ms ease;
+}
+
+/* One coat per color, cross-faded by mode: gradients can't transition, opacity can. */
+.ph-orb .coat {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 450ms ease;
+}
+
+.ph-orb .coat.c-gray {
+  background: radial-gradient(circle at 34% 28%, #d8d8dc 0%, #8e8e93 32%, #4a4a4f 70%, #26262a 100%);
+  opacity: 1;
+}
+
+.ph-orb .coat.c-blue {
+  background: radial-gradient(circle at 34% 28%, #cfe6ff 0%, #4aa3ff 30%, #0a63d6 68%, #043a85 100%);
+}
+
+.ph-orb .coat.c-green {
+  background: radial-gradient(circle at 34% 28%, #d9ffe4 0%, #5ee38a 30%, #1aa848 68%, #0b5a27 100%);
+}
+
+.ph-orb .coat.c-amber {
+  background: radial-gradient(circle at 34% 28%, #fff0cc 0%, #ffbf47 30%, #e0810a 68%, #7a4300 100%);
+}
+
+.ph-orb[data-mode="speaking"] .coat.c-blue,
+.ph-orb[data-mode="listening"] .coat.c-green,
+.ph-orb[data-mode="thinking"] .coat.c-amber {
+  opacity: 1;
+}
+
+.ph-orb .gloss {
+  position: absolute;
+  left: 18%;
+  top: 8%;
+  width: 46%;
+  height: 34%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 40%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+}
+
+/* Listening: a ring that expands, so the judge sees "your turn" even before they speak. */
+.ph-orb .pulse {
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ph-orb[data-mode="listening"] .pulse {
+  animation: ph-pulse 1.5s ease-out infinite;
+}
+
+@keyframes ph-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.ph-orbword {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ph-text-2);
+  letter-spacing: 0.01em;
+  min-height: 20px;
+}
+
+.ph-orbwrap[data-mode="speaking"] .ph-orbword {
+  color: #8ec5ff;
+}
+
+.ph-orbwrap[data-mode="listening"] .ph-orbword {
+  color: #7fe3a0;
+}
+
+.ph-orbwrap[data-mode="thinking"] .ph-orbword {
+  color: #ffc46b;
+}
+
+.ph-orbhint {
+  font-size: 13px;
+  color: var(--ph-text-3);
+  min-height: 18px;
+  animation: ph-caption 400ms ease-out;
+}
+
+.ph-orbhint.blank {
+  animation: none;
+}
+
+.ph-pill {
+  border: 0;
+  border-radius: 999px;
+  padding: 7px 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  background: #fff;
+  animation: ph-caption 260ms ease-out;
+}
+
+.ph-note {
+  font-size: 13px;
+  color: #ffd60a;
+  text-align: center;
+  max-width: 320px;
+  margin-top: 4px;
+}
+
+.ph-typing {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 360px;
+  margin-top: 8px;
+}
+
+.ph-typing .ph-input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  font-size: 16px; /* 16px stops iOS zooming into the field */
+}
+
+.ph-send {
+  border: 0;
+  border-radius: 14px;
+  padding: 0 18px;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: var(--ph-blue);
+}
+
+.ph-send:disabled {
+  opacity: 0.5;
+}
+
+.ph-controls {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: clamp(18px, 9vw, 34px);
+  width: 100%;
+  margin-top: 16px;
+  flex: none;
+}
+
+/* ---------------------------------------------------------------- */
+/* Microphone status chip                                            */
+/* ---------------------------------------------------------------- */
+
+.ph-micchip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  max-width: 100%;
+  text-align: center;
+}
+
+.ph-micchip .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--ph-text-2);
+  background: var(--ph-glass);
+  max-width: 100%;
+  line-height: 1.3;
+}
+
+.ph-micchip .chip i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ph-gray);
+  flex: none;
+}
+
+.ph-micchip[data-mic="granted"] .chip {
+  color: #b9f2c9;
+  background: rgba(48, 209, 88, 0.16);
+}
+
+.ph-micchip[data-mic="granted"] .chip i {
+  background: var(--ph-green);
+  box-shadow: 0 0 0 3px rgba(48, 209, 88, 0.22);
+}
+
+.ph-micchip[data-mic="denied"] .chip {
+  color: #ffc7c2;
+  background: rgba(255, 59, 48, 0.18);
+}
+
+.ph-micchip[data-mic="denied"] .chip i {
+  background: var(--ph-red);
+  box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.22);
+}
+
+.ph-micchip.compact {
+  margin-top: 6px;
+  gap: 0;
+}
+
+.ph-micchip.compact .chip {
+  padding: 3px 9px;
+  font-size: 11px;
+}
+
+.ph-pill.ghost {
+  color: var(--ph-text);
+  background: var(--ph-glass-2);
+}
+
+/* ---------------------------------------------------------------- */
+/* Level meter under the orb                                         */
+/* ---------------------------------------------------------------- */
+
+.ph-meter {
+  width: 120px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  margin-top: -6px;
+}
+
+.ph-meter.on {
+  opacity: 1;
+}
+
+.ph-meter i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #5ee38a, #30d158 70%, #ffd60a);
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+/* No analyser on the mic (iOS, denied): the track stays dim so nobody waits for a bar. */
+.ph-meter.on:not(.live) {
+  opacity: 0.35;
+}
+
+/* ---------------------------------------------------------------- */
+/* Hold to talk + auto-listen                                        */
+/* ---------------------------------------------------------------- */
+
+.ph-talkrow {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  max-width: 360px;
+  margin-top: 8px;
+}
+
+.ph-hold {
+  flex: 1;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 50px;
+  border: 0;
+  border-radius: 16px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(48, 209, 88, 0.22);
+  box-shadow: inset 0 0 0 1.5px rgba(48, 209, 88, 0.55);
+  transition: background 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+  touch-action: none; /* a long press must not scroll or select */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.ph-hold svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.ph-hold:disabled {
+  opacity: 0.4;
+}
+
+.ph-hold.on,
+.ph-hold:not(:disabled):active {
+  color: #06240f;
+  background: var(--ph-green);
+  box-shadow: 0 0 0 6px rgba(48, 209, 88, 0.25);
+  transform: scale(0.99);
+}
+
+.ph-toggle {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 78px;
+  border: 0;
+  border-radius: 16px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ph-text-2);
+  background: var(--ph-glass);
+}
+
+.ph-toggle i {
+  position: relative;
+  width: 30px;
+  height: 18px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background 160ms ease;
+}
+
+.ph-toggle i::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 160ms ease;
+}
+
+.ph-toggle.on {
+  color: var(--ph-text);
+}
+
+.ph-toggle.on i {
+  background: var(--ph-green);
+}
+
+.ph-toggle.on i::after {
+  transform: translateX(12px);
+}
+
+/* ---------------------------------------------------------------- */
+/* Ended: the summary card                                           */
+/* ---------------------------------------------------------------- */
+
+.ph-summary {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 26px 22px 22px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 30px 60px rgba(0, 0, 0, 0.45);
+  animation: ph-card 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes ph-card {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ph-summary-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.ph-summary-shield {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(48, 209, 88, 0.16);
+  color: var(--ph-green);
+}
+
+.ph-summary-shield svg {
+  width: 28px;
+  height: 28px;
+}
+
+.ph-summary-who {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.ph-summary .ph-name {
+  font-size: 26px;
+}
+
+.ph-summary-title {
+  font-size: 15px;
+  color: var(--ph-text-2);
+  margin-top: 6px;
+}
+
+.ph-summary-outcome {
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--ph-text-2);
+  max-width: 300px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ph-summary-outcome .sub {
+  font-size: 13px;
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
+.ph-summary[data-signed="1"] .ph-summary-outcome {
+  color: #b9f2c9;
+  background: rgba(48, 209, 88, 0.12);
+}
+
+.ph-summary[data-signed="1"] .ph-summary-outcome .head {
+  font-weight: 600;
+  color: #dfffe8;
+}
+
+.ph-done {
+  margin-top: 8px;
+  background: var(--ph-glass-2);
+}
+
+/* ---------------------------------------------------------------- */
+/* Small screens                                                     */
+/* ---------------------------------------------------------------- */
+
+@media (max-height: 640px) {
+  .ph-top {
+    margin-top: 3vh;
+  }
+  .ph-radar {
+    width: 120px;
+    height: 120px;
+    margin-top: 2vh;
+  }
+  .ph-orbwrap {
+    --orb: 118px;
+    gap: 8px;
+  }
+  .ph-callhead .ph-name {
+    font-size: 22px;
+  }
+  .ph-callhead .ph-timer {
+    font-size: 15px;
+  }
+  .ph-callhead {
+    margin-bottom: 4px;
+  }
+  .ph-captions {
+    gap: 8px;
+    padding: 10px 4px 8px;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 6px, #000 52px);
+    mask-image: linear-gradient(to bottom, transparent 6px, #000 52px);
+  }
+  .ph-doctorline {
+    font-size: 14px;
+  }
+  .ph-agentline {
+    font-size: clamp(15px, 4.6vw, 18px);
+  }
+  .ph-agentline[data-long="1"] {
+    font-size: clamp(13px, 4.1vw, 16px);
+  }
+  .ph-controls {
+    margin-top: 10px;
+  }
+  .ph-circle {
+    width: 64px;
+    height: 64px;
+  }
+  .ph-circle.small {
+    width: 54px;
+    height: 54px;
+  }
+  .ph-summary {
+    padding: 18px 16px 16px;
+    gap: 6px;
+  }
+  .ph-timer.big {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 340px) {
+  .ph {
+    --ph-pad-x: 16px;
+  }
+  .ph-callhead .ph-name {
+    font-size: 22px;
+  }
+  .ph-orbwrap {
+    --orb: 124px;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Embedded in the console (?embedded=1, a 360×720 iframe)           */
+/* ---------------------------------------------------------------- */
+
+.ph[data-embedded="1"] {
+  --ph-pad-top: 14px;
+  --ph-pad-bottom: 14px;
+  --ph-pad-x: 16px;
+}
+
+.ph[data-embedded="1"] .ph-screen {
+  height: 100%;
+  max-width: none;
+}
+
+.ph[data-embedded="1"] .ph-top {
+  margin-top: 18px;
+}
+
+.ph[data-embedded="1"] .ph-mark {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 10px;
+}
+
+.ph[data-embedded="1"] .ph-title {
+  font-size: 24px;
+}
+
+.ph[data-embedded="1"] .ph-sub {
+  font-size: 15px;
+}
+
+.ph[data-embedded="1"] .ph-primary.big {
+  margin-top: 34px;
+  padding: 20px;
+  font-size: 20px;
+}
+
+.ph[data-embedded="1"] .ph-radar {
+  width: 130px;
+  height: 130px;
+  margin: 22px 0 18px;
+}
+
+.ph[data-embedded="1"] .ph-name {
+  font-size: 26px;
+}
+
+.ph[data-embedded="1"] .ph-callhead {
+  margin-top: 0;
+}
+
+.ph[data-embedded="1"] .ph-callhead .ph-name {
+  font-size: 22px;
+}
+
+.ph[data-embedded="1"] .ph-callhead .ph-timer {
+  font-size: 15px;
+}
+
+.ph[data-embedded="1"] .ph-orbwrap {
+  --orb: 118px;
+  gap: 8px;
+  margin: 0;
+}
+
+.ph[data-embedded="1"] .ph-captions {
+  gap: 8px;
+  padding: 8px 4px 6px;
+  min-height: 48px;
+}
+
+.ph[data-embedded="1"] .ph-agentline {
+  font-size: 17px;
+}
+
+.ph[data-embedded="1"] .ph-agentline[data-long="1"] {
+  font-size: 15px;
+}
+
+.ph[data-embedded="1"] .ph-doctorline {
+  font-size: 14px;
+}
+
+.ph[data-embedded="1"] .ph-controls {
+  margin-top: 10px;
+}
+
+.ph[data-embedded="1"] .ph-circle {
+  width: 60px;
+  height: 60px;
+}
+
+.ph[data-embedded="1"] .ph-circle.small {
+  width: 52px;
+  height: 52px;
+}
+
+.ph[data-embedded="1"] .ph-action {
+  font-size: 13px;
+  gap: 7px;
+}
+
+.ph[data-embedded="1"] .ph-actions {
+  margin-top: 18px;
+  margin-bottom: 8px;
+}
+
+.ph[data-embedded="1"] .ph-hold {
+  min-height: 46px;
+}
+
+.ph[data-embedded="1"] .ph-summary {
+  padding: 20px 16px 16px;
+  gap: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ph *,
+  .ph *::before,
+  .ph *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .ph-shield-draw .outline,
+  .ph-shield-draw .check {
+    stroke-dashoffset: 0;
+  }
+  .ph-shield-draw .fill {
+    opacity: 1;
+  }
+  .ph-orb .halo {
+    opacity: 0.5;
+  }
+}
