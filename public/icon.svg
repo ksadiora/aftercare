@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Aftercare">
+  <rect width="64" height="64" rx="15" fill="#2c6551"/>
+  <path d="M32 47.5S17.5 39 17.5 29.2A8.2 8.2 0 0 1 32 24a8.2 8.2 0 0 1 14.5 5.2C46.5 39 32 47.5 32 47.5Z"
+        fill="none" stroke="#ffffff" stroke-width="3.4" stroke-linejoin="round"/>
+  <path d="M24 31.6h5l2.2-4.3 2.6 8 2.3-3.7H40" fill="none" stroke="#ffffff"
+        stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

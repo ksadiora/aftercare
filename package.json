@@ -1,0 +1,45 @@
+{
+  "name": "aftercare-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n api,web \"npm:dev:server\" \"npm:dev:web\"",
+    "dev:server": "PORT=4318 node --env-file-if-exists=.env --import tsx --watch server/index.ts",
+    "dev:web": "vite --host 127.0.0.1 --port 4317 --strictPort",
+    "build": "tsc --noEmit && vite build",
+    "start": "NODE_ENV=production node --env-file-if-exists=.env --import tsx server/index.ts",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "voice:setup": "node --env-file-if-exists=.env --import tsx scripts/setup-voice.ts"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@elevenlabs/client": "1.25.0",
+    "@fontsource/dm-sans": "5.3.0",
+    "@fontsource/manrope": "5.3.0",
+    "express": "5.2.1",
+    "livekit-client": "2.22.3",
+    "lucide-react": "1.47.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/express": "5.0.6",
+    "@types/node": "26.6.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/supertest": "7.2.1",
+    "@vitejs/plugin-react": "6.1.1",
+    "concurrently": "10.0.5",
+    "supertest": "7.2.2",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2",
+    "vite": "8.3.0",
+    "vitest": "5.0.1"
+  }
+}

@@ -1,0 +1,19 @@
+node_modules/
+dist/
+data/
+.env
+.env.*
+!.env.example
+test-results/
+playwright-report/
+.DS_Store
+deploy/certs/
+deploy/livekit.rendered.yaml
+
+# Host-specific production values (IPs, SSH key name, dashboard password hash).
+# This repository is public-capable; those belong on the machine, not in git.
+PRODUCTION.local.md
+*.local.md
+
+# Event paperwork that arrived in the working directory, not part of the project.
+*.pdf

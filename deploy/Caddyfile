@@ -1,0 +1,28 @@
+# Terminates TLS and forwards to the app. Server-Sent Events need buffering off.
+{$APP_DOMAIN} {
+	encode zstd gzip
+
+	# The application has no authentication of its own, and the nurse identity is a
+	# query parameter. This is the only thing standing between the public internet and
+	# a patient worklist plus endpoints that spend your Gemini quota.
+	#
+	# Both values are required. If either is unset, Caddy refuses to start rather than
+	# serving the dashboard openly, which is the intended failure.
+	# Generate a hash with: docker run --rm caddy:2-alpine caddy hash-password
+	# The patient's invitation link must open without the care-team password — the
+	# token in the URL is their credential. Everything else stays behind the prompt,
+	# including the whole nurse API, so a patient token reaches only their own
+	# check-in and never the worklist.
+	# /assets/* is the compiled client bundle, which the patient's page has to load.
+	# It contains no data — every API call still needs a credential — but it does mean
+	# the built JavaScript is publicly downloadable. That is the cost of one bundle.
+	@protected not path /c/* /api/outreach/* /assets/* /icon.svg
+	basic_auth @protected {
+		{$DASHBOARD_USER} {$DASHBOARD_PASSWORD_HASH}
+	}
+
+	reverse_proxy aftercare:4317 {
+		flush_interval -1
+		header_up X-Forwarded-Proto {scheme}
+	}
+}

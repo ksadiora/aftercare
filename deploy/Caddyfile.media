@@ -1,0 +1,18 @@
+# TLS terminator for LiveKit signalling on the media instance.
+#
+# Without this, the browser resolves wss://rtc.<domain> to port 443 and finds nothing
+# listening. There is no fallback: the app page is HTTPS, so browsers block plain ws://
+# as mixed content, and the handoff fails at the moment it is needed.
+#
+# Certificates come from the certbot run in deploy/README.md rather than Caddy's own
+# ACME, so that LiveKit's TURN listener can read exactly the same files and only one
+# renewal path exists on this instance.
+{$RTC_DOMAIN} {
+	tls /certs/live/aftercare/fullchain.pem /certs/live/aftercare/privkey.pem
+
+	# reverse_proxy upgrades WebSocket connections automatically. flush_interval -1
+	# disables response buffering, which signalling needs.
+	reverse_proxy 127.0.0.1:7880 {
+		flush_interval -1
+	}
+}

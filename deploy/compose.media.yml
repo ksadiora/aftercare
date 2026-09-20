@@ -1,0 +1,34 @@
+# Vultr instance 2: LiveKit + TURN, with Caddy terminating TLS for signalling.
+#
+# Host networking is used deliberately for both services: the RTC and TURN port ranges
+# are too wide to publish individually through Docker's proxy, and Caddy must reach
+# LiveKit on 127.0.0.1:7880, which is only possible in the same network namespace.
+# Because of host mode there is no `ports:` key — the firewall is what controls exposure.
+services:
+  livekit:
+    image: livekit/livekit-server:latest
+    restart: unless-stopped
+    network_mode: host
+    command: --config /etc/livekit/livekit.yaml
+    volumes:
+      - ./livekit.rendered.yaml:/etc/livekit/livekit.yaml:ro
+      - ./certs:/etc/livekit/certs:ro
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      # Must be the same hostname as LIVEKIT_URL in the app's .env.
+      RTC_DOMAIN: "${RTC_DOMAIN:?set RTC_DOMAIN, for example rtc.example.com}"
+    volumes:
+      - ./Caddyfile.media:/etc/caddy/Caddyfile:ro
+      - ./certs:/certs:ro
+      - caddy-media-data:/data
+      - caddy-media-config:/config
+    depends_on:
+      - livekit
+
+volumes:
+  caddy-media-data:
+  caddy-media-config:

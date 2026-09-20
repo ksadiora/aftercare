@@ -1,0 +1,44 @@
+# Vultr instance 1: the Aftercare app behind Caddy for automatic HTTPS.
+# Caddy obtains certificates from Let's Encrypt, so app.<domain> must already
+# resolve to this instance before the first start.
+services:
+  aftercare:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      # TRUSTED_HOSTS is what actually allows a non-localhost host; DNS alone does not.
+      TRUSTED_HOSTS: "${APP_DOMAIN:?set APP_DOMAIN, for example app.example.com}"
+      HOST: 0.0.0.0
+      PORT: 4317
+      DATABASE_PATH: /data/aftercare.sqlite
+    volumes:
+      - aftercare-data:/data
+    expose:
+      - "4317"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      APP_DOMAIN: "${APP_DOMAIN:?set APP_DOMAIN, for example app.example.com}"
+      # Required. Without them Caddy will not start, so the dashboard is never
+      # published unauthenticated by accident.
+      DASHBOARD_USER: "${DASHBOARD_USER:?set DASHBOARD_USER}"
+      DASHBOARD_PASSWORD_HASH: "${DASHBOARD_PASSWORD_HASH:?generate one with caddy hash-password}"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - aftercare
+
+volumes:
+  aftercare-data:
+  caddy-data:
+  caddy-config:
