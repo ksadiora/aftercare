@@ -88,8 +88,13 @@ describe('an escalation must pass the gate before it reaches the provider', () =
     expect(view.escalation.sender).toBe('aftercare-careteam.xyz');
     expect(view.escalation.steps.find((s: { id: string }) => s.id === 'resolve').status).toBe('fail');
     expect(view.escalation.reason).toMatch(/resolve/i);
-    // A rejected attempt does not put the case in the provider's queue.
-    expect((await request(server.app).get('/api/provider/queue')).body).toEqual([]);
+    // A rejected demo attempt never touches delivery: the genuine escalation is still with the provider.
+    const queue = (await request(server.app).get('/api/provider/queue')).body;
+    expect(queue).toHaveLength(1);
+    expect(queue[0].escalation.variant).toBe('genuine');
+    expect(queue[0].escalation.status).toBe('delivered');
+    // The nurse's view shows the newest attempt, the provider's shows the newest genuine one.
+    expect((await request(server.app).get('/api/patients/johnson/escalation?genuine=1')).body.escalation.status).toBe('delivered');
   });
 
   it('rejects a message tampered with after signing at the signature check', async () => {

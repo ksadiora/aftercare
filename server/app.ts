@@ -226,8 +226,9 @@ export function createApp(store: Store, options: { voice?: VoiceConfig; gemini?:
     if (action === 'escalate') { await attachEscalationSummary(id); await gate.deliver({ patientId: id, nurse, note }); }
     res.json(store.patient(id)); publish();
   });
-  const escalationView = (id: string) => ({ ...gate.capability(), escalation: store.latestEscalation(id), policy: gate.policy() });
-  app.get('/api/patients/:id/escalation', (req, res) => { store.patient(String(req.params.id)); res.json(escalationView(String(req.params.id))); });
+  // The nurse sees the newest attempt, demos included; the provider sees the newest genuine one (?genuine=1), which is what decides delivery.
+  const escalationView = (id: string, genuineOnly = false) => ({ ...gate.capability(), escalation: store.latestEscalation(id, genuineOnly), policy: gate.policy() });
+  app.get('/api/patients/:id/escalation', (req, res) => { store.patient(String(req.params.id)); res.json(escalationView(String(req.params.id), req.query.genuine === '1')); });
   // Re-run delivery for a held or rejected escalation. Only a nurse asks for this; it never changes the case.
   app.post('/api/patients/:id/escalation/retry', async (req, res) => {
     const { nurse } = z.object({ nurse: z.string().trim().min(1).max(60).default('Demo nurse') }).parse(req.body ?? {});
