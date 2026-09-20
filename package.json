@@ -11,7 +11,12 @@
     "start": "NODE_ENV=production node --env-file-if-exists=.env --import tsx server/index.ts",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "voice:setup": "node --env-file-if-exists=.env --import tsx scripts/setup-voice.ts"
+    "voice:setup": "node --env-file-if-exists=.env --import tsx scripts/setup-voice.ts",
+    "agent": "npm --prefix callsign run dev",
+    "agent:start": "npm --prefix callsign run start",
+    "agent:test": "npm --prefix callsign test",
+    "cove": "npm --prefix codis-cove start",
+    "dev:all": "concurrently -k -n api,web,agent -c blue,cyan,green \"npm:dev:server\" \"npm:dev:web\" \"npm:agent\""
   },
   "engines": {
     "node": ">=24"
@@ -20,11 +25,13 @@
     "@elevenlabs/client": "1.25.0",
     "@fontsource/dm-sans": "5.3.0",
     "@fontsource/manrope": "5.3.0",
+    "@peculiar/x509": "2.1.0",
     "express": "5.2.1",
     "livekit-client": "2.22.3",
     "lucide-react": "1.47.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "reflect-metadata": "0.2.2",
     "zod": "4.6.5"
   },
   "devDependencies": {

@@ -8,6 +8,14 @@ export const config = {
   brandAgentName: env("BRAND_AGENT_NAME", "stelazio.brand-demo.com"),
   impostorAgentName: env("IMPOSTOR_AGENT_NAME", "stelazio-updates.xyz"),
 
+  // Display identities. Aftercare runs this agent for its provider, so the
+  // doctor and the sender (the care-team agent) are configured, not hard-coded.
+  hcpDoctorName: env("HCP_DOCTOR_NAME", "Dr. Priya Patel"),
+  hcpSpecialty: env("HCP_SPECIALTY", "Cardiology"),
+  hcpOrganization: env("HCP_ORGANIZATION", "Blacksburg Cardiology Associates"),
+  brandDisplayName: env("BRAND_DISPLAY_NAME", "Stelazio"),
+  brandOrganization: env("BRAND_ORGANIZATION", "Stelazio Pharmaceuticals (demo)"),
+
   ans: {
     mode: env("ANS_MODE", "local") as "mock" | "local" | "real",
     apiKey: env("ANS_API_KEY"),

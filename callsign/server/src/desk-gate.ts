@@ -11,7 +11,7 @@ export function enforceDeskDelivery(session: DeskSession, request: ReachRequest 
     session.holdReason = "Held in inbox: verification, doctor policy, and content approval must all complete before delivery.";
     return false;
   }
-  const policy = evaluatePolicy({ specialty: request?.payload.specialty, doctorSpecialty: doctor.specialty, hasReceipt: true });
+  const policy = evaluatePolicy({ specialty: request?.payload.specialty, doctorSpecialty: doctor.specialty, doctorName: doctor.name, hasReceipt: true });
   const hasRequest = request?.id === session.verification!.requestId;
   if (!hasRequest || !policy.ok) {
     session.status = "held";

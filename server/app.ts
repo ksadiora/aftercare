@@ -12,6 +12,8 @@ import { createResponder } from './respond.js';
 import { answerCaseQuestion, generateBriefing, ruleSummary, type Briefing } from './briefing.js';
 import { HANDOFF_RING_MS, joinToken, mediaCapability, type MediaConfig } from './handoff.js';
 import { ansCapability, verifyCareTeam, type AnsConfig } from './ans.js';
+import { EscalationGate } from './callsign/gate.js';
+import { localRegistryRouter } from './callsign/local-registry.js';
 
 export function createApp(store: Store, options: { voice?: VoiceConfig; gemini?: GeminiConfig; media?: MediaConfig; ans?: AnsConfig; careTeamEndpoint?: string; ringMs?: number; trustedHosts?: string[]; allowedOrigins?: string[]; outreach?: boolean; simulationDelay?: number; fetcher?: typeof fetch; serveStatic?: boolean } = {}) {
   const app = express();
@@ -29,8 +31,8 @@ export function createApp(store: Store, options: { voice?: VoiceConfig; gemini?:
   const ringMs = options.ringMs ?? HANDOFF_RING_MS;
   const abilities = () => {
     const g = geminiCapability(gemini); const m = mediaCapability(media);
-    const a = ansCapability(ans);
-    return { ...capabilities(voice), chat: g.enabled, chatReason: g.reason, model: g.model, handoff: m.enabled, handoffReason: m.reason, ringSeconds: Math.round(ringMs / 1000), ans: a.enabled, ansReason: a.reason, careTeam: a.careTeam };
+    const a = ansCapability(ans); const c = gate.capability();
+    return { ...capabilities(voice), chat: g.enabled, chatReason: g.reason, model: g.model, handoff: m.enabled, handoffReason: m.reason, ringSeconds: Math.round(ringMs / 1000), ans: a.enabled, ansReason: a.reason, careTeam: a.careTeam, escalationGate: c.enabled, escalationGateReason: c.reason, providerAgentName: c.providerAgentName, providerName: c.providerName, careTeamAgentName: c.careTeamAgentName, registryMode: c.registryMode };
   };
   // A patient asking for a person rings the care team only when a live route exists.
   const maybeHandoff = (session: Session) => {
@@ -39,6 +41,8 @@ export function createApp(store: Store, options: { voice?: VoiceConfig; gemini?:
     try { store.requestHandoff(session.patientId, session.id, 'The patient asked to speak with a person.'); } catch { /* callback task remains */ }
   };
   const publish = () => { for (const peer of peers) peer.write(`id: ${Date.now()}\nevent: update\ndata: {}\n\n`); };
+  // The escalation gate (Callsign, in-process): decides whether an escalation may reach the provider, with evidence.
+  const gate = new EscalationGate(store, publish);
   // Localhost stays the default. Deployment must name its hosts; DNS alone is not enough.
   const trustedHosts = (options.trustedHosts || []).map(h => h.trim().toLowerCase()).filter(Boolean);
   const isLocal = (host: string) => ['localhost', '127.0.0.1'].includes(host);
@@ -90,6 +94,8 @@ export function createApp(store: Store, options: { voice?: VoiceConfig; gemini?:
     next();
   });
   app.use(express.json({ limit: '64kb' }));
+  // The local ANS-shaped registry the gate verifies against (CA, certificates, zone, transparency log). Public, read-only.
+  app.use('/ans', localRegistryRouter);
   app.get('/api/health', (_req, res) => res.json({ ok: true }));
   app.get('/api/capabilities', (_req, res) => res.json(abilities()));
   app.get('/api/dashboard', (_req, res) => res.json(store.dashboard()));
@@ -207,7 +213,7 @@ export function createApp(store: Store, options: { voice?: VoiceConfig; gemini?:
     }
   };
   app.post('/api/patients/:id/actions', async (req, res) => {
-    const { action, note } = z.object({ action: z.enum(['acknowledge', 'resolve', 'escalate', 'callback']), note: z.string().trim().max(2000).default('') }).parse(req.body);
+    const { action, note, nurse } = z.object({ action: z.enum(['acknowledge', 'resolve', 'escalate', 'callback']), note: z.string().trim().max(2000).default(''), nurse: z.string().trim().min(1).max(60).default('Demo nurse') }).parse(req.body);
     const id = String(req.params.id);
     const patient = store.action(id, action, note);
     // A callback with a live audio route rings the patient's own page rather than
@@ -216,8 +222,38 @@ export function createApp(store: Store, options: { voice?: VoiceConfig; gemini?:
       try { store.requestHandoff(id, null, 'The care team is calling you back.'); }
       catch { /* another handoff is live; the callback task stands */ }
     }
-    if (action === 'escalate') await attachEscalationSummary(id);
-    res.json(patient); publish();
+    // The escalation is on record first; then the gate decides whether it may reach the provider. The nurse sees the verdict with the response.
+    if (action === 'escalate') { await attachEscalationSummary(id); await gate.deliver({ patientId: id, nurse, note }); }
+    res.json(store.patient(id)); publish();
+  });
+  const escalationView = (id: string) => ({ ...gate.capability(), escalation: store.latestEscalation(id), policy: gate.policy() });
+  app.get('/api/patients/:id/escalation', (req, res) => { store.patient(String(req.params.id)); res.json(escalationView(String(req.params.id))); });
+  // Re-run delivery for a held or rejected escalation. Only a nurse asks for this; it never changes the case.
+  app.post('/api/patients/:id/escalation/retry', async (req, res) => {
+    const { nurse } = z.object({ nurse: z.string().trim().min(1).max(60).default('Demo nurse') }).parse(req.body ?? {});
+    const id = String(req.params.id); const last = store.latestEscalation(id);
+    if (!last) throw new AppError(409, 'Escalate the case first; there is nothing to retry.');
+    await gate.deliver({ patientId: id, nurse, note: last.note });
+    res.json(escalationView(id)); publish();
+  });
+  // Demo: what an attacker's copy of the last escalation looks like to the gate. Recorded as a rejected attempt, never delivered.
+  app.post('/api/patients/:id/escalation/demo', async (req, res) => {
+    const { variant, nurse } = z.object({ variant: z.enum(['spoof', 'tamper', 'replay']), nurse: z.string().trim().min(1).max(60).default('Demo nurse') }).parse(req.body);
+    const id = String(req.params.id);
+    if (!store.latestEscalation(id)) throw new AppError(409, 'Escalate the case first so there is a genuine escalation to imitate.');
+    await gate.demo(id, nurse, variant);
+    res.json(escalationView(id)); publish();
+  });
+  app.get('/api/provider/policy', (_req, res) => res.json(gate.policy()));
+  app.post('/api/provider/policy', (req, res) => {
+    const patch = z.object({ acceptCalls: z.boolean().optional(), specialtyOnly: z.boolean().optional(), note: z.string().trim().max(80).optional() }).parse(req.body);
+    res.json(gate.setPolicy(patch)); publish();
+  });
+  // Everything a third party needs to re-check a delivery decision: the record, with the evidence of every step.
+  app.get('/api/proof/:requestId', (req, res) => {
+    const record = store.escalationByRequest(String(req.params.requestId));
+    if (!record) throw new AppError(404, 'No escalation with that request id.');
+    res.json({ ...record, generatedAt: new Date().toISOString() });
   });
   const scoped = (req: express.Request) => {
     const outreach = store.outreachByToken(String(req.params.token));

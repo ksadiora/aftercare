@@ -310,7 +310,7 @@ function policyStep(req: ReachRequest): StepFn {
   return async () => {
     // Identity is settled by the time we get here; this is whether Dr. Patel wants the call now.
     const { evaluatePolicy } = await import("../policy.ts");
-    const r = evaluatePolicy({ specialty: req.payload.specialty, doctorSpecialty: doctor.specialty, hasReceipt: true });
+    const r = evaluatePolicy({ specialty: req.payload.specialty, doctorSpecialty: doctor.specialty, doctorName: doctor.name, hasReceipt: true });
     return { ok: r.ok, detail: r.detail, evidence: [...r.evidence, sourceRow("doctor's policy · this server, live toggles from the Present sheet")] };
   };
 }

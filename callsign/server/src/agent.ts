@@ -64,7 +64,7 @@ export async function handleReach(req: ReachRequest, options?: DeskReachOptions)
       contentReason = "Content screening unavailable · held in inbox";
       result.content = { decision: "ask", summary: contentReason, source: "local" };
     }
-    const policy = evaluatePolicy({ specialty: req.payload.specialty, doctorSpecialty: doctor.specialty, hasReceipt: true });
+    const policy = evaluatePolicy({ specialty: req.payload.specialty, doctorSpecialty: doctor.specialty, doctorName: doctor.name, hasReceipt: true });
     if (result.outcome === "call" && !policy.ok) {
       result.outcome = "inbox";
       const step = result.steps.find((step) => step.id === "policy")!;

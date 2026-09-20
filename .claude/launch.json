@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "aftercare",
+      "runtimeExecutable": "C:\\Program Files\\Git\\bin\\bash.exe",
+      "runtimeArgs": ["-c", "export PATH=\"/c/Program Files/nodejs:$PATH\"; export npm_config_script_shell=\"C:/Program Files/Git/bin/bash.exe\"; npm run dev"],
+      "port": 4317
+    }
+  ]
+}

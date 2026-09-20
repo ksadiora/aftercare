@@ -7,9 +7,9 @@ import { config } from "../config.ts";
  */
 
 export const doctor: DoctorProfile = {
-  name: "Dr. Priya Patel",
+  name: config.hcpDoctorName,
   agentName: config.hcpAgentName,
-  specialty: "Cardiology",
+  specialty: config.hcpSpecialty,
   npi: "1932847561",
   state: "VA",
   licenseNumber: "0101-284736",
@@ -21,22 +21,22 @@ export const hcpIdentity: AgentIdentity = {
   name: config.hcpAgentName,
   role: "hcp",
   displayName: doctor.name,
-  organization: "Blacksburg Cardiology Associates",
+  organization: config.hcpOrganization,
   cardUrl: `https://${config.hcpAgentName}/.well-known/agent.json`,
 };
 
 export const brandIdentity: AgentIdentity = {
   name: config.brandAgentName,
   role: "brand",
-  displayName: "Stelazio",
-  organization: "Stelazio Pharmaceuticals (demo)",
+  displayName: config.brandDisplayName,
+  organization: config.brandOrganization,
   cardUrl: `https://${config.brandAgentName}/.well-known/agent.json`,
 };
 
 export const impostorIdentity: AgentIdentity = {
   name: config.impostorAgentName,
   role: "impostor",
-  displayName: "Stelazio", // it claims to be the brand
+  displayName: config.brandDisplayName, // it claims to be the brand
   organization: "unknown",
   cardUrl: `https://${config.impostorAgentName}/.well-known/agent.json`,
 };

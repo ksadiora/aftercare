@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowLeft, HeartHandshake, Inbox, LoaderCircle, Send, Stethoscope, TriangleAlert } from 'lucide-react';
-import type { CaseMessage, Patient } from '../shared/types';
+import type { CaseMessage, EscalationRecord, Patient } from '../shared/types';
 import { severityLabels } from '../shared/types';
 import { api } from './api';
 import { Briefing } from './Briefing';
+import { EscalationGate, ProviderPolicyToggle } from './EscalationGate';
 
 interface QueueItem {
   patient: Patient; escalatedAt: string | null; reason: string;
   summary: string | null; summarySource: string | null;
   lastReply: string | null; repliedAt: string | null;
   thread: CaseMessage[];
+  escalation: EscalationRecord | null;
 }
 
 const time = (value: string | null) => value ? new Date(value).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
@@ -61,6 +63,7 @@ export function ProviderView({ chatReady, chatReason }: { chatReady: boolean; ch
     <header className="provider-top">
       <a className="brand" href="/" aria-label="Aftercare home"><span className="brand-icon"><HeartHandshake size={20} strokeWidth={1.8} /></span>aftercare<span className="brand-period">.</span></a>
       <span className="provider-role"><Stethoscope size={14} />Provider view · {provider}</span>
+      <ProviderPolicyToggle />
       <a className="text-button" href="/"><ArrowLeft size={14} />Switch role</a>
     </header>
 
@@ -89,6 +92,7 @@ export function ProviderView({ chatReady, chatReason }: { chatReady: boolean; ch
             <p>{current.summary}</p>
             <span className="small muted">{current.summarySource}</span>
           </div>}
+          <EscalationGate patientId={current.patient.id} mode="provider" />
           <div className="case-thread" aria-label="Conversation with the care team">
             <span className="small-kicker">CONVERSATION WITH THE CARE TEAM{current.thread.at(-1)?.role === 'nurse' ? ' · AWAITING YOU' : ' · AWAITING THE NURSE'}</span>
             <div className="case-messages">
@@ -104,7 +108,7 @@ export function ProviderView({ chatReady, chatReason }: { chatReady: boolean; ch
           <form className="provider-reply" onSubmit={reply}>
             <label htmlFor="provider-note">Reply to the nurse</label>
             <textarea id="provider-note" rows={3} maxLength={2000} value={note}
-              placeholder="Guidance for the nurse, or a question back to them. This goes into the patient's audit trail."
+              placeholder="Guidance for the nurse, or a question back to them. This goes into the patient's audit trail and, when your Callsign agent has connected the call, to that conversation too."
               onChange={e => setNote(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void reply(e); } }} />
             <button className="button primary" disabled={busy || !note.trim()}><Send size={15} />{busy ? 'Sending…' : 'Send to nurse'}</button>

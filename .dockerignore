@@ -1,0 +1,9 @@
+node_modules
+callsign
+codis-cove
+dist
+data
+.git
+test-results
+playwright-report
+*.pdf

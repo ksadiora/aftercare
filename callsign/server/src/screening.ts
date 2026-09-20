@@ -1,5 +1,6 @@
 import type { DeskAssessment, DeskSignal, DeskTurn } from "@callsign/shared/src/desk.ts";
 import { generateGeminiJson, isGeminiConfigured } from "./providers/gemini.ts";
+import { doctor } from "./seed/data.ts";
 
 export interface ScreeningResult {
   assessment: DeskAssessment;
@@ -8,7 +9,7 @@ export interface ScreeningResult {
 }
 
 const screeningReplies: Record<DeskAssessment["decision"], string> = {
-  ask: "What is the reason for contacting Dr. Patel, and what would you like the doctor to do? Please leave out private patient details, passwords, payment information, and access codes.",
+  ask: `What is the reason for contacting ${doctor.name}, and what would you like the doctor to do? Please leave out private patient details, passwords, payment information, and access codes.`,
   allow: "The content check passed. Delivery also requires agent verification and the doctor's current policy. The human caller's name is self-reported; keep sensitive information out of this conversation.",
   block: "I can't put this request through. Callsign does not pass along requests for secrets, unsafe payments, device access, or attempts to bypass screening. Contact the office through a separately verified channel.",
 };
@@ -41,7 +42,7 @@ const dangerRules: Array<{ label: string; detail: string; pattern: RegExp }> = [
   },
 ].map((rule) => ({ ...rule, pattern: new RegExp(rule.pattern.source, "is") }));
 
-const ordinaryPurpose = /\b(?:appointment|schedule|scheduling|reschedule|rescheduling|follow[ -]?up|callback|call back|returning (?:a|the|your) call|referral|meeting|delivery|deliveries|office hours|availability|available|lab results?|test results?|prescription refill|refill request|(?:label|dosing|prescribing information) (?:update|guidance))\b/i;
+const ordinaryPurpose = /\b(?:appointment|schedule|scheduling|reschedule|rescheduling|follow[ -]?up|callback|call back|returning (?:a|the|your) call|referral|meeting|delivery|deliveries|office hours|availability|available|lab results?|test results?|prescription refill|refill request|(?:label|dosing|prescribing information) (?:update|guidance)|escalation|case review|provider review|post[ -]?discharge|discharge (?:summary|check[ -]?in))\b/i;
 const pressure = /\b(?:urgent|urgently|immediately|right now|final warning|legal action|suspend|arrest|secret|confidential|do not tell|don't tell)\b/i;
 const unsafeLink = /(?:https?:\/\/|www\.)\S+/i;
 const credentialContext = /\b(?:log[ -]?in|sign[ -]?in|verify|verification|account|payment|bank|credential)\b/i;
@@ -104,7 +105,7 @@ export function localScreen(transcript: Pick<DeskTurn, "role" | "text">[]): Scre
 
   return {
     assessment: { decision: "ask", risk: "medium", summary: "There is not enough detail to decide whether this contact should reach the doctor. No external identity checks have been performed.", signals: [{ label: "Purpose unclear", detail: "An ordinary, specific reason for contacting the doctor is still needed.", severity: "warning" }], source: "local", identity: "unverified" },
-    response: "Hello, I'm Dr. Patel's Callsign assistant. What is the reason for your call, and what would you like the doctor to do? Please leave out private patient details and access codes.",
+    response: `Hello, I'm ${doctor.name}'s Callsign assistant. What is the reason for your call, and what would you like the doctor to do? Please leave out private patient details and access codes.`,
   };
 }
 

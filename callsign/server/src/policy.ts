@@ -38,7 +38,7 @@ export function updatePolicy(patch: PolicyUpdateBody): DoctorPolicy {
  * ok=false with a human reason to hold in the inbox. Evidence lists the
  * inputs so the proof drawer can show why.
  */
-export function evaluatePolicy(input: { specialty?: string; doctorSpecialty: string; hasReceipt: boolean }): {
+export function evaluatePolicy(input: { specialty?: string; doctorSpecialty: string; hasReceipt: boolean; doctorName?: string }): {
   ok: boolean;
   detail: string;
   evidence: { label: string; value: string; mono?: boolean }[];
@@ -53,6 +53,6 @@ export function evaluatePolicy(input: { specialty?: string; doctorSpecialty: str
   if (p.requireReceipt && !input.hasReceipt) return { ok: false, detail: "no transparency-log receipt", evidence };
   const relevant = !p.specialtyOnly || !input.specialty || input.specialty === input.doctorSpecialty;
   if (!relevant) return { ok: false, detail: `not relevant to ${input.doctorSpecialty} · held in inbox`, evidence };
-  if (!p.acceptCalls) return { ok: false, detail: `${p.note ?? "Dr. Patel is not taking calls"} · held in inbox`, evidence };
+  if (!p.acceptCalls) return { ok: false, detail: `${p.note ?? `${input.doctorName ?? "The doctor"} is not taking calls`} · held in inbox`, evidence };
   return { ok: true, detail: `relevant to ${input.doctorSpecialty} · accepting calls · caller allowed`, evidence };
 }
