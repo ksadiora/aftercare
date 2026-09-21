@@ -863,14 +863,18 @@ Every step between them remains inspectable.
 
 ## Team
 
-Avighna Wuthoo
-Sahith Sammidi
-Karan Sadiora
+## Team
+
+| Team Member        | LinkedIn                                                   |
+| ------------------ | ---------------------------------------------------------- |
+| **Avighna Wuthoo** | [LinkedIn](https://www.linkedin.com/in/avighna-wuthoo-ai/) |
+| **Sahith Sammidi** | [LinkedIn](https://www.linkedin.com/in/sahith-sammidi/)    |
+| **Karan Sadiora**  | [LinkedIn](https://www.linkedin.com/in/ksadiora/)          |
+
+---
 
 <p align="center">
-  <strong>Aftercare</strong>
-  <br>
-  Post-discharge follow-up that reaches out first.
-  <br><br>
+  <strong>Aftercare</strong><br>
+  Post-discharge follow-up that reaches the patient first.<br><br>
   <strong>Built at VT Hacks 14</strong>
 </p>
