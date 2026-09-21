@@ -863,17 +863,9 @@ Every step between them remains inspectable.
 
 ## Team
 
-**[Team Member]** — [GitHub] · [LinkedIn]
-**[Team Member]** — [GitHub] · [LinkedIn]
-**[Team Member]** — [GitHub] · [LinkedIn]
-
----
-
-## License
-
-MIT License
-
----
+Avighna Wuthoo
+Sahith Sammidi
+Karan Sadiora
 
 <p align="center">
   <strong>Aftercare</strong>
