@@ -7,8 +7,6 @@ Aftercare is an AI-assisted post-discharge follow-up system that conducts biling
 It combines conversational AI, deterministic safety rules, real-time voice, clinician workflows, cryptographic identity verification, and auditable evidence into one post-discharge care system.
 
 
-**Demo Video:** [Add demo link]
-**Devpost:** [Add Devpost link]
 **Built at VT Hacks 14**
 
 ---
@@ -860,8 +858,6 @@ The provider gets a verified escalation.
 Every step between them remains inspectable.
 
 ---
-
-## Team
 
 ## Team
 
